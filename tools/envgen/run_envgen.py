@@ -9,6 +9,7 @@ from tools.scraping.skillcheck_content import SkillcheckContent
 
 from tools.scraping.skillcheck_content import PageNotFoundError
 from tools.codegen.code_generator import FileNotExistsError
+from tools.common.file_exist_checker import FileNotExistsError
 
 
 class RunEnvGen:

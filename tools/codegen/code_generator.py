@@ -6,27 +6,17 @@ from jinja2 import Environment, FileSystemLoader
 from tools.config.file_config import FileConfig
 from tools.codegen.extract_render_param import ExtractRenderParam
 from tools.scraping.question_content import QuestionContent
-
-
-class FileNotExistsError(Exception):
-    pass
+from tools.common.file_exist_checker import check_file_exist
+from tools.common.file_exist_checker import check_file_not_exist
 
 
 class CodeGenerator:
     def __init__(self, root_dir: str):
         self.root_dir = root_dir
         config_filepath = os.path.join(self.root_dir, "user_config.yaml")
-        self._check_file_not_exist(config_filepath)
+        check_file_not_exist(config_filepath)
         with open(config_filepath, encoding="utf-8") as f:
             self.config = yaml.safe_load(f)
-
-    def _check_file_exist(self, filepath: str) -> None:
-        if os.path.isfile(filepath):
-            raise FileExistsError
-
-    def _check_file_not_exist(self, filepath: str) -> None:
-        if not os.path.isfile(filepath):
-            raise FileNotExistsError
 
     def _render_template(
         self, template_dir_path: str, template_file_name: str, render_param_dict: dict
@@ -42,20 +32,20 @@ class CodeGenerator:
     ) -> None:
         # Load metadata
         meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
-        self._check_file_not_exist(meta_file_path)
+        check_file_not_exist(meta_file_path)
 
         # Get script file path. In addition, check for existence only when is_overwrite is True.
         with open(meta_file_path, "r", encoding="utf-8") as f:
             metadata = json.load(f)
             script_file_path = os.path.join(dirpath, metadata["script_file"])
         if not is_overwrite:
-            self._check_file_exist(script_file_path)
+            check_file_exist(script_file_path)
 
         # Get template file path. In addition, check for existence.
         template_file_path = os.path.join(
             self.root_dir, self.config["Template"]["FilePath"]
         )
-        self._check_file_not_exist(template_file_path)
+        check_file_not_exist(template_file_path)
 
         # Get the necessary parameters for render from content and create a script
         (template_dir_path, template_file_name) = os.path.split(template_file_path)

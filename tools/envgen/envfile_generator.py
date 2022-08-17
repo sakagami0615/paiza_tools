@@ -2,15 +2,12 @@ import os
 import json
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
+from tools.common.file_exist_checker import check_dir_exist
 
 
 class EnvFileGenerator:
     def __init__(self):
         pass
-
-    def _check_env_exist(self, dirpath) -> None:
-        if os.path.isdir(dirpath):
-            raise FileExistsError
 
     def _create_metadata(self, content: QuestionContent) -> dict:
         metadata_dict = {}
@@ -28,7 +25,7 @@ class EnvFileGenerator:
     ) -> None:
         create_dirpath = os.path.join(dirpath, content.ques_number)
         if not is_overwrite:
-            self._check_env_exist(create_dirpath)
+            check_dir_exist(create_dirpath)
 
         os.makedirs(create_dirpath, exist_ok=True)
 
