@@ -2,7 +2,7 @@ import os
 import json
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
-from tools.common.file_exist_checker import check_dir_exist
+from tools.common.file_exist_checker import check_dir_not_exist
 
 
 class EnvFileGenerator:
@@ -25,7 +25,7 @@ class EnvFileGenerator:
     ) -> None:
         create_dirpath = os.path.join(dirpath, content.ques_number)
         if not is_overwrite:
-            check_dir_exist(create_dirpath)
+            check_dir_not_exist(create_dirpath)
 
         os.makedirs(create_dirpath, exist_ok=True)
 
