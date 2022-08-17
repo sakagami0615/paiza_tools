@@ -1,7 +1,7 @@
 from typing import List
 
-class RunCodeTest:
 
+class RunCodeTest:
     def __init__(self, prog: str, args: List[str]):
         pass
 

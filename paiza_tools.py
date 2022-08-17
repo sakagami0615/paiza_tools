@@ -5,10 +5,10 @@ from tools.codegen.run_codegen import RunCodeGen
 from tools.codetest.run_codetest import RunCodeTest
 
 
-MODE_ENV_GEN = 'gen'
-MODE_CODE_GEN = 'codegen'
-MODE_TEST = 'test'
-MODE_USAGE = 'usage'
+MODE_ENV_GEN = "gen"
+MODE_CODE_GEN = "codegen"
+MODE_TEST = "test"
+MODE_USAGE = "usage"
 
 
 def usage(args):
@@ -18,7 +18,7 @@ def usage(args):
     print(f"{args[0]} usage : show this tool's usage")
 
 
-if __name__ == '__main__':
+if __name__ == "__main__":
 
     cmdline_args = sys.argv
 
@@ -28,7 +28,7 @@ if __name__ == '__main__':
 
     root_dir = os.path.dirname(os.path.abspath(__file__))
 
-    tool_prog = ' '.join(cmdline_args[:2])
+    tool_prog = " ".join(cmdline_args[:2])
     tool_mode = cmdline_args[1]
     tool_args = cmdline_args[2:]
 

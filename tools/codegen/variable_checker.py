@@ -1,13 +1,11 @@
-
 class VariableChecker:
-
     def __init__(self):
         pass
 
     def __check_datatype_enable(self, var_dict: dict):
         for vars in var_dict.values():
             for var in vars:
-                if var.datatype in ['int', 'float', 'str']:
+                if var.datatype in ["int", "float", "str"]:
                     return False
         return True
 
@@ -44,4 +42,4 @@ class VariableChecker:
             self.__check_element_variable_match(var_dict),
         ]
         result = False if False in results else True
-        return  result
+        return result
