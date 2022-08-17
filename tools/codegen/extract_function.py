@@ -36,10 +36,10 @@ class ExtractFunction:
         if len(elem_token) < 2:
             size_1d = elem_token[0]
             return var_name, size_1d, "1"
-        else:
-            size_1d = elem_token[0]
-            size_2d = elem_token[1]
-            return var_name, size_1d, size_2d
+
+        size_1d = elem_token[0]
+        size_2d = elem_token[1]
+        return var_name, size_1d, size_2d
 
     @staticmethod
     def extract_variable_datatype(
@@ -58,14 +58,14 @@ class ExtractFunction:
 
         try:
             input_line = 0
-            for key, vars in var_dict.items():
+            for key, var_list in var_dict.items():
                 begin_line, end_line = key
                 # 複数行にまたがる変数がない場合
-                if type(begin_line) == int and type(end_line) == int:
+                if isinstance(begin_line, int) and isinstance(end_line, int):
                     input_tokens = onecase_input_list[input_line].split()
                     input_line += 1
                     token_idx = 0
-                    for var in vars:
+                    for var in var_list:
                         # データ型格納
                         if token_idx < len(input_tokens):
                             var_num_dict[var.name] = input_tokens[token_idx]
@@ -73,7 +73,7 @@ class ExtractFunction:
                                 input_tokens[token_idx]
                             )
                         # 次の探索データまでインデックスを進める
-                        if type(var.size_1d) == int:
+                        if isinstance(var.size_1d, int):
                             token_idx += var.size_1d
                         else:
                             token_idx += int(var_num_dict[var.size_1d])
@@ -98,7 +98,7 @@ class ExtractFunction:
                     input_tokens = onecase_input_list[input_line].split()
                     input_line += end_line - begin_line
                     token_idx = 0
-                    for var in vars:
+                    for var in var_list:
                         # データ型格納
                         if token_idx < len(input_tokens):
                             var_num_dict[var.name] = input_tokens[token_idx]
@@ -106,14 +106,14 @@ class ExtractFunction:
                                 input_tokens[token_idx]
                             )
                         # 次の探索データまでインデックスを進める
-                        if type(var.size_2d) == int:
+                        if isinstance(var.size_2d, int):
                             token_idx += var.size_2d
                         else:
                             token_idx += int(var_num_dict[var.size_2d])
-        except KeyError:
-            raise ExtractRenderParamError
-        except IndexError:
-            raise ExtractRenderParamError
+        except KeyError as exc:
+            raise ExtractRenderParamError from exc
+        except IndexError as exc:
+            raise ExtractRenderParamError from exc
         return var_datatype_dict
 
     @staticmethod
@@ -190,9 +190,9 @@ class ExtractFunction:
         input_proc_str = ""
         curr_indent = 1
 
-        for vars in var_dict.values():
+        for var_list in var_dict.values():
             # 配列初期化コード
-            for var in vars:
+            for var in var_list:
                 # scalar
                 if var.size_1d == 1:
                     pass
@@ -210,7 +210,7 @@ class ExtractFunction:
                     )
 
             for_cnt = 0
-            for var in vars:
+            for var in var_list:
                 # scalar
                 if var.size_1d == 1:
                     # inputコード
@@ -266,9 +266,9 @@ class ExtractFunction:
 
     @staticmethod
     def create_solve_argument_str(var_dict: dict) -> str:
-        varname = (
-            lambda v: v.name if v.size_1d == 1 and v.size_2d == 1 else v.name + "_list"
-        )
+        def varname(v):
+            return v.name if v.size_1d == 1 and v.size_2d == 1 else v.name + "_list"
+
         solve_arg_str = ", ".join(
             [varname(value) for values in var_dict.values() for value in values]
         )

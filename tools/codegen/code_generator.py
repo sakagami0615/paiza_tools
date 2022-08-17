@@ -15,9 +15,9 @@ class FileNotExistsError(Exception):
 class CodeGenerator:
     def __init__(self, root_dir: str):
         self.root_dir = root_dir
-        config_filepath = os.path.join(self.root_dir, "user_config.yml")
+        config_filepath = os.path.join(self.root_dir, "user_config.yaml")
         self._check_file_not_exist(config_filepath)
-        with open(config_filepath) as f:
+        with open(config_filepath, encoding="utf-8") as f:
             self.config = yaml.safe_load(f)
 
     def _check_file_exist(self, filepath: str) -> None:
@@ -45,7 +45,7 @@ class CodeGenerator:
         self._check_file_not_exist(meta_file_path)
 
         # Get script file path. In addition, check for existence only when is_overwrite is True.
-        with open(meta_file_path, "r") as f:
+        with open(meta_file_path, "r", encoding="utf-8") as f:
             metadata = json.load(f)
             script_file_path = os.path.join(dirpath, metadata["script_file"])
         if not is_overwrite:
@@ -65,5 +65,5 @@ class CodeGenerator:
         render_code = self._render_template(
             template_dir_path, template_file_name, render_param_dict
         )
-        with open(script_file_path, "w") as f:
+        with open(script_file_path, "w", encoding="utf-8") as f:
             f.write(render_code)

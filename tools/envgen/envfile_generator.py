@@ -3,6 +3,7 @@ import json
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
 
+
 class EnvFileGenerator:
     def __init__(self):
         pass
@@ -40,16 +41,16 @@ class EnvFileGenerator:
             create_dirpath, metadata["output_file_format"]
         )
 
-        with open(meta_file_path, "w") as f:
+        with open(meta_file_path, "w", encoding="utf-8") as f:
             json.dump(metadata, f, indent=4)
 
-        with open(ques_file_path, "w") as f:
+        with open(ques_file_path, "w", encoding="utf-8") as f:
             f.write(content.html)
 
         for i, (input_text, answer_text) in enumerate(
             zip(content.input_list, content.answer_list)
         ):
-            with open(input_file_format.format(i + 1), "w") as f:
+            with open(input_file_format.format(i + 1), "w", encoding="utf-8") as f:
                 f.write(input_text)
-            with open(output_file_format.format(i + 1), "w") as f:
+            with open(output_file_format.format(i + 1), "w", encoding="utf-8") as f:
                 f.write(answer_text)

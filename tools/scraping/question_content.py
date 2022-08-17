@@ -52,9 +52,11 @@ class QuestionContent:
         def create_testcase_str(no: int, input_str: str, answer_str: str) -> str:
             input_list = input_str.split("\n")
             answer_list = answer_str.split("\n")
-            input_max_width = max(max([len(x) for x in input_list]), len(HEADER_INPUT))
+            input_max_width = max(max(len(x) for x in input_list), len(HEADER_INPUT))
 
-            padding = lambda x: x + " " * (input_max_width - len(x))
+            def padding(x):
+                return x + " " * (input_max_width - len(x))
+
             result_line = f"/// SampleCase_{no} ///\n"
             result_line += f"{padding(HEADER_INPUT)} | {HEADER_OUTPUT}\n"
             for input_line, output_line in zip_longest(input_list, answer_list):

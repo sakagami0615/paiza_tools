@@ -1,0 +1,7 @@
+ignore-paths:
+  - tests
+  - templates
+
+pylint:
+  disable:
+    - too-many-arguments

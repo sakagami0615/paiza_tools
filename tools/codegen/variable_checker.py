@@ -3,8 +3,8 @@ class VariableChecker:
         pass
 
     def _check_datatype_enable(self, var_dict: dict):
-        for vars in var_dict.values():
-            for var in vars:
+        for var_list in var_dict.values():
+            for var in var_list:
                 if var.datatype in ["int", "float", "str"]:
                     return False
         return True
@@ -14,11 +14,11 @@ class VariableChecker:
         # ex) x[0], y[0]
         #     ...   ...
         #     x[N], y[N] みたいに揃っているかを確認する
-        for vars in var_dict.values():
-            if len(vars) < 2:
+        for var_list in var_dict.values():
+            if len(var_list) < 2:
                 continue
-            base_size_1d = vars[0].size_1d
-            for var in vars:
+            base_size_1d = var_list[0].size_1d
+            for var in var_list:
                 if var.size_id != base_size_1d:
                     return False
         return True
@@ -26,12 +26,12 @@ class VariableChecker:
     def _check_element_variable_match(self, var_dict: dict):
         # 要素指定に使われている変数が定義されているかを確認
         var_set = set()
-        for vars in var_dict.values():
-            for var in vars:
+        for var_list in var_dict.values():
+            for var in var_list:
                 var_set.add(var.name)
-                if type(var.size_1d) == str and var.size_1d in var_set:
+                if isinstance(var.size_1d, str) and var.size_1d in var_set:
                     return False
-                if type(var.size_2d) == str and var.size_2d in var_set:
+                if isinstance(var.size_2d, str) and var.size_2d in var_set:
                     return False
         return True
 
@@ -41,5 +41,4 @@ class VariableChecker:
             self._check_element_size_match(var_dict),
             self._check_element_variable_match(var_dict),
         ]
-        result = False if False in results else True
-        return result
+        return all(results)
