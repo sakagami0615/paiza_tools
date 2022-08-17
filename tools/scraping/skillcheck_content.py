@@ -10,6 +10,10 @@ class PageNotFoundError(Exception):
     pass
 
 
+class QuestionNumberError(Exception):
+    pass
+
+
 class SampleCaseSizeError(Exception):
     pass
 
@@ -56,7 +60,10 @@ class SkillcheckContent:
 
         title = problem_soup.text
         title = title.replace("再チャレンジ", "").strip()
-        ques_number = title.split(":")[0]
+        ques_number = title.split(":")[0].strip()
+        if not ques_number:
+            raise QuestionNumberError
+
         return ques_number
 
     def _extract_question_sentence(self, page_soup: BeautifulSoup) -> str:
