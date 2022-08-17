@@ -5,7 +5,7 @@ class VariableChecker:
     def _check_datatype_enable(self, var_dict: dict):
         for var_list in var_dict.values():
             for var in var_list:
-                if var.datatype in ["int", "float", "str"]:
+                if var.datatype not in ["int", "float", "str"]:
                     return False
         return True
 
@@ -19,7 +19,7 @@ class VariableChecker:
                 continue
             base_size_1d = var_list[0].size_1d
             for var in var_list:
-                if var.size_id != base_size_1d:
+                if var.size_1d != base_size_1d:
                     return False
         return True
 
@@ -29,9 +29,9 @@ class VariableChecker:
         for var_list in var_dict.values():
             for var in var_list:
                 var_set.add(var.name)
-                if isinstance(var.size_1d, str) and var.size_1d in var_set:
+                if isinstance(var.size_1d, str) and var.size_1d not in var_set:
                     return False
-                if isinstance(var.size_2d, str) and var.size_2d in var_set:
+                if isinstance(var.size_2d, str) and var.size_2d not in var_set:
                     return False
         return True
 

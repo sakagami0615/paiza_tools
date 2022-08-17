@@ -85,7 +85,7 @@ class SkillcheckContent:
 
         # 不要文字と行の削除
         target_text = format_soup.text.replace(self.VARIABLE_CLASS_TEXT, "").strip()
-        target_text = self._remove_head_line(target_text)
+        target_text = self._remove_head_line(target_text).strip()
 
         # 先頭の説明文字の次に記載されている入力フォーマット内容を抽出
         target_list = target_text.split("\n\n")

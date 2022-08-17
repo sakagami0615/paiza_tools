@@ -28,17 +28,17 @@ class ExtractFunction:
     def extract_varname_and_size(item: str) -> Tuple[str, str, str]:
         item_token = item.split("_", 1)
         if len(item_token) < 2:
-            return item, "1", "1"
-        var_name = item_token[0]
+            return item.strip(), "1", "1"
+        var_name = item_token[0].strip()
         elem_str = re.sub(r"[{}]", "", item_token[1])
 
         elem_token = elem_str.split(",")
         if len(elem_token) < 2:
-            size_1d = elem_token[0]
+            size_1d = elem_token[0].strip()
             return var_name, size_1d, "1"
 
-        size_1d = elem_token[0]
-        size_2d = elem_token[1]
+        size_1d = elem_token[0].strip()
+        size_2d = elem_token[1].strip()
         return var_name, size_1d, size_2d
 
     @staticmethod
