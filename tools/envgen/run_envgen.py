@@ -12,9 +12,9 @@ from tools.scraping.skillcheck_content import PageNotFoundError
 class RunEnvGen:
     def __init__(self, root_dir: str, prog: str, args: List[str]):
         self.root_dir = root_dir
-        self.args = self.__get_cmdline_args(prog, args)
+        self.args = self._get_cmdline_args(prog, args)
 
-    def __get_cmdline_args(self, prog: str, args: List[str]) -> argparse.Namespace:
+    def _get_cmdline_args(self, prog: str, args: List[str]) -> argparse.Namespace:
         parser = argparse.ArgumentParser(prog=prog)
         parser.add_argument(
             "-w",

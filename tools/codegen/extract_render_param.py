@@ -14,19 +14,19 @@ class ExtractRenderParam:
         self.config = config
         self.content = content
 
-    def __extract_const_yes(self) -> Tuple[bool, str]:
+    def _extract_const_yes(self) -> Tuple[bool, str]:
         match_result = re.search(r"yes", self.content.excepted_output, re.IGNORECASE)
         if match_result:
             return True, match_result.group(0)
         return False, ""
 
-    def __extract_const_no(self) -> Tuple[bool, str]:
+    def _extract_const_no(self) -> Tuple[bool, str]:
         match_result = re.search(r"no", self.content.excepted_output, re.IGNORECASE)
         if match_result:
             return True, match_result.group(0)
         return False, ""
 
-    def __extract_code(self):
+    def _extract_code(self):
         # 変数抽出用の入力を用意
         var_format = ExtractFunction.remove_blank_in_curly_brackets(
             self.content.var_format
@@ -56,9 +56,9 @@ class ExtractRenderParam:
 
     def extract_param_dict(self) -> dict:
         try:
-            is_yes_str, yes_str = self.__extract_const_yes()
-            is_no_str, no_str = self.__extract_const_no()
-            input_process, solve_args = self.__extract_code()
+            is_yes_str, yes_str = self._extract_const_yes()
+            is_no_str, no_str = self._extract_const_no()
+            input_process, solve_args = self._extract_code()
 
             render_param_dict = {
                 "extract_success": True,

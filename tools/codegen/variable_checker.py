@@ -2,14 +2,14 @@ class VariableChecker:
     def __init__(self):
         pass
 
-    def __check_datatype_enable(self, var_dict: dict):
+    def _check_datatype_enable(self, var_dict: dict):
         for vars in var_dict.values():
             for var in vars:
                 if var.datatype in ["int", "float", "str"]:
                     return False
         return True
 
-    def __check_element_size_match(self, var_dict: dict):
+    def _check_element_size_match(self, var_dict: dict):
         # 同じ列の入力データの変数の要素数が会っているかを確認
         # ex) x[0], y[0]
         #     ...   ...
@@ -23,7 +23,7 @@ class VariableChecker:
                     return False
         return True
 
-    def __check_element_variable_match(self, var_dict: dict):
+    def _check_element_variable_match(self, var_dict: dict):
         # 要素指定に使われている変数が定義されているかを確認
         var_set = set()
         for vars in var_dict.values():
@@ -37,9 +37,9 @@ class VariableChecker:
 
     def check_variable_dict(self, var_dict: dict) -> bool:
         results = [
-            self.__check_datatype_enable(var_dict),
-            self.__check_element_size_match(var_dict),
-            self.__check_element_variable_match(var_dict),
+            self._check_datatype_enable(var_dict),
+            self._check_element_size_match(var_dict),
+            self._check_element_variable_match(var_dict),
         ]
         result = False if False in results else True
         return result

@@ -13,14 +13,14 @@ class VariableInfo:
         self.datatype = datatype
         self.__size_1d = size_1d if type(size_1d) == str else str(size_1d)
         self.__size_2d = size_2d if type(size_2d) == str else str(size_2d)
-        self.__size_1d, self.is_dynamic_size_1d = self.__judge_var_dynamic(
+        self.__size_1d, self.is_dynamic_size_1d = self._judge_var_dynamic(
             self.__size_1d
         )
-        self.__size_2d, self.is_dynamic_size_2d = self.__judge_var_dynamic(
+        self.__size_2d, self.is_dynamic_size_2d = self._judge_var_dynamic(
             self.__size_2d
         )
 
-    def __judge_var_dynamic(self, var: str):
+    def _judge_var_dynamic(self, var: str):
         token = var.split("_")
         if len(token) < 2:
             return var, False
@@ -38,14 +38,14 @@ class VariableInfo:
     @size_1d.setter
     def size_1d(self, size_1d):
         self.__size_1d = size_1d if type(size_1d) == str else str(size_1d)
-        self.__size_1d, self.is_dynamic_size_1d = self.__judge_var_dynamic(
+        self.__size_1d, self.is_dynamic_size_1d = self._judge_var_dynamic(
             self.__size_1d
         )
 
     @size_2d.setter
     def size_2d(self, size_2d):
         self.__size_2d = size_2d if type(size_2d) == str else str(size_2d)
-        self.__size_2d, self.is_dynamic_size_2d = self.__judge_var_dynamic(
+        self.__size_2d, self.is_dynamic_size_2d = self._judge_var_dynamic(
             self.__size_2d
         )
 
