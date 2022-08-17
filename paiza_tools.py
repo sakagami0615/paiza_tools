@@ -37,6 +37,6 @@ if __name__ == "__main__":
     elif tool_mode == MODE_CODE_GEN:
         RunCodeGen(root_dir, tool_prog, tool_args).run()
     elif tool_mode == MODE_TEST:
-        RunCodeTest(tool_prog, tool_args).run()
+        RunCodeTest(root_dir, tool_prog, tool_args).run()
     else:
         usage(cmdline_args)
