@@ -3,16 +3,15 @@ import json
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
 
-
 class EnvFileGenerator:
     def __init__(self):
         pass
 
-    def __check_env_exist(self, dirpath) -> None:
+    def _check_env_exist(self, dirpath) -> None:
         if os.path.isdir(dirpath):
             raise FileExistsError
 
-    def __create_metadata(self, content: QuestionContent) -> dict:
+    def _create_metadata(self, content: QuestionContent) -> dict:
         metadata_dict = {}
         metadata_dict["ques_number"] = content.ques_number
         metadata_dict["n_test_cases"] = content.n_test_cases
@@ -28,11 +27,11 @@ class EnvFileGenerator:
     ) -> None:
         create_dirpath = os.path.join(dirpath, content.ques_number)
         if not is_overwrite:
-            self.__check_env_exist(create_dirpath)
+            self._check_env_exist(create_dirpath)
 
         os.makedirs(create_dirpath, exist_ok=True)
 
-        metadata = self.__create_metadata(content)
+        metadata = self._create_metadata(content)
 
         meta_file_path = os.path.join(create_dirpath, metadata["metadata_file"])
         ques_file_path = os.path.join(create_dirpath, metadata["question_file"])
