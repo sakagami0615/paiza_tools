@@ -6,7 +6,9 @@ import argparse
 from tools.envgen.envfile_generator import EnvFileGenerator
 from tools.codegen.code_generator import CodeGenerator
 from tools.scraping.skillcheck_content import SkillcheckContent
+
 from tools.scraping.skillcheck_content import PageNotFoundError
+from tools.codegen.code_generator import FileNotExistsError
 
 
 class RunEnvGen:
@@ -48,3 +50,5 @@ class RunEnvGen:
             print("ERROR1")
         except FileExistsError:
             print("ERROR2")
+        except FileNotExistsError:
+            print("ERROR3")
