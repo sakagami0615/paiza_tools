@@ -61,10 +61,10 @@ class ExtractRenderParam:
             value情報: [登場する変数の情報, ...]
 
         Raises:
-            ExtractRenderParamError: _description_
+            ExtractRenderParamError: 辞書の作成に失敗
 
         Returns:
-            dict: _description_
+            dict: 変数情報を格納した辞書
         """
         # 変数抽出用の入力を用意
         var_format = self._remove_blank_in_curly_brackets(self.content.var_format)

@@ -63,7 +63,7 @@ class CreateVariableDict:
             size_1d = value["var"].size_1d
             if begin_line + 1 < end_line:
                 # 開始行の値がすでに辞書に登録されている場合は、更新値に反映させる
-                # ex) 辞書が {6: 2 + N} で、(開始,終了,size_1d)が(6,10,M)の場合、{10: 2 + N + M} とする
+                # ex) 辞書が {6: 2 + N} で、(開始,終了,size_1d) が (6,10,M) の場合、{10: 2 + N + M} とする
                 stack = "" if begin_line not in update_dict else update_dict[begin_line]
                 if stack:
                     update_dict[end_line] = f"{stack} + {size_1d}"
