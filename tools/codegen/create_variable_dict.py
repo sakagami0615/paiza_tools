@@ -1,6 +1,6 @@
 import re
 from collections import OrderedDict
-from typing import List, Tuple
+from typing import List, Tuple, Union
 
 from tools.codegen.variable_info import VariableInfo
 
@@ -87,74 +87,74 @@ class CreateVariableDict:
             appear_dict[key].append(value["var"])
         return appear_dict
 
+    def _get_datatype(self, element: str) -> str:
+        for func in [int, float]:
+            try:
+                return type(func(element)).__name__
+            except ValueError:
+                pass
+        return "str"
+
+    def _replace_var_str2int(self, line: str, var_num_dict: dict) -> int:
+        # 定数変数を数値に置き換える
+        item_list = re.split(r"\s*[-+]\s*", line)
+        value = 0
+        for item in item_list:
+            if self._get_datatype(item) == "int":
+                value += int(item)
+            else:
+                value += int(var_num_dict[item])
+        return value
+
     def _create_variable_datatype_dict(
         self, appear_dict: dict, onecase_input_list: List[str]
     ) -> dict:
         var_datatype_dict = {}
         var_num_dict = {}
 
-        def datatype(element: str) -> str:
-            for func in [int, float]:
-                try:
-                    return type(func(element)).__name__
-                except ValueError:
-                    pass
-            return "str"
+        # 辞書にデータ型を格納
+        def update_var_dict(
+            token_idx: int, var_name: str, var_size: Union[int, str]
+        ) -> int:
+            # データ型格納
+            if token_idx < len(input_tokens):
+                var_num_dict[var_name] = input_tokens[token_idx]
+                var_datatype_dict[var_name] = self._get_datatype(
+                    input_tokens[token_idx]
+                )
+            # 次の探索データまでインデックスを進める
+            if isinstance(var_size, int):
+                token_idx += var_size
+            else:
+                token_idx += int(var_num_dict[var_size])
+            return token_idx
 
         try:
             input_line = 0
             for key, var_list in appear_dict.items():
                 begin_line, end_line = key
+                input_tokens = onecase_input_list[input_line].split()
+
                 # 複数行にまたがる変数がない場合
                 if isinstance(begin_line, int) and isinstance(end_line, int):
                     input_tokens = onecase_input_list[input_line].split()
                     input_line += 1
                     token_idx = 0
                     for var in var_list:
-                        # データ型格納
-                        if token_idx < len(input_tokens):
-                            var_num_dict[var.name] = input_tokens[token_idx]
-                            var_datatype_dict[var.name] = datatype(
-                                input_tokens[token_idx]
-                            )
-                        # 次の探索データまでインデックスを進める
-                        if isinstance(var.size_1d, int):
-                            token_idx += var.size_1d
-                        else:
-                            token_idx += int(var_num_dict[var.size_1d])
+                        token_idx = update_var_dict(token_idx, var.name, var.size_1d)
                 # 複数行にまたがる変数がある場合
                 else:
-                    # 定数変数を数値に置き換える
-                    begin_list = re.split(r"\s*[-+]\s*", str(begin_line))
-                    end_list = re.split(r"\s*[-+]\s*", str(end_line))
-                    begin_line = 0
-                    for item in begin_list:
-                        if datatype(item) == "int":
-                            begin_line += int(item)
-                        else:
-                            begin_line += int(var_num_dict[item])
-                    end_line = 0
-                    for item in end_list:
-                        if datatype(item) == "int":
-                            end_line += int(item)
-                        else:
-                            end_line += int(var_num_dict[item])
+                    begin_line = self._replace_var_str2int(
+                        str(begin_line), var_num_dict
+                    )
+                    end_line = self._replace_var_str2int(str(end_line), var_num_dict)
 
                     input_tokens = onecase_input_list[input_line].split()
                     input_line += end_line - begin_line
                     token_idx = 0
                     for var in var_list:
-                        # データ型格納
-                        if token_idx < len(input_tokens):
-                            var_num_dict[var.name] = input_tokens[token_idx]
-                            var_datatype_dict[var.name] = datatype(
-                                input_tokens[token_idx]
-                            )
-                        # 次の探索データまでインデックスを進める
-                        if isinstance(var.size_2d, int):
-                            token_idx += var.size_2d
-                        else:
-                            token_idx += int(var_num_dict[var.size_2d])
+                        token_idx = update_var_dict(token_idx, var.name, var.size_2d)
+
         except KeyError as exc:
             raise ExtractRenderParamError from exc
         except IndexError as exc:
