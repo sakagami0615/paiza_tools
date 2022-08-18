@@ -1,9 +1,10 @@
-import json
 import os
 import subprocess
 from typing import List, Tuple
 
-from tools.common.file_exist_checker import check_file_exist
+from tools.codetest.execute_result import ExecuteResult
+from tools.common.color_code import ColorCode
+from tools.common.file_function import check_file_exist, read_json, read_text
 from tools.config.file_config import FileConfig
 
 
@@ -12,11 +13,24 @@ class ExecuteCode:
         self.dirpath = dirpath
         meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
         check_file_exist(meta_file_path)
-        with open(meta_file_path, "r", encoding="utf-8") as f:
-            self.metadata = json.load(f)
+        self.metadata = read_json(meta_file_path)
+        self._check_env_data()
+
+    def _check_env_data(self) -> None:
+        script_file_path = os.path.join(self.dirpath, self.metadata["script_file"])
+        check_file_exist(script_file_path)
+        for case_id in range(self.metadata["n_test_cases"]):
+            input_file_path = os.path.join(
+                self.dirpath, self.metadata["input_file_format"].format(case_id + 1)
+            )
+            output_file_path = os.path.join(
+                self.dirpath, self.metadata["output_file_format"].format(case_id + 1)
+            )
+            check_file_exist(input_file_path)
+            check_file_exist(output_file_path)
 
     def _run_command(
-        self, exec_cmd: List[str], input_file_path: str
+        self, exec_cmd: List[str], input_file_path: Tuple[int, str]
     ) -> Tuple[int, str]:
         with open(input_file_path, "r", encoding="utf-8") as f:
             proc = subprocess.run(
@@ -25,28 +39,47 @@ class ExecuteCode:
                 universal_newlines=True,
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
-                check=True,
             )
-        return proc.returncode, proc.stdout
+        return proc.returncode, proc.stdout[:-1]  # 末尾の改行を1文字削除
 
-    def _execute_one_case(self, case_id: int) -> None:
-        script_file_path = os.path.join(self.dirpath, self.metadata["script_file"])
-        check_file_exist(script_file_path)
+    def _run_one_case(self, case_id: int) -> Tuple[bool, str]:
+        script_file_name = self.metadata["script_file"]
+        script_file_path = os.path.join(self.dirpath, script_file_name)
 
-        input_file_path = os.path.join(
-            self.dirpath, self.metadata["input_file_format"].format(case_id)
-        )
-        output_file_path = os.path.join(
-            self.dirpath, self.metadata["output_file_format"].format(case_id)
-        )
-        check_file_exist(input_file_path)
-        check_file_exist(output_file_path)
+        input_file_name = self.metadata["input_file_format"].format(case_id + 1)
+        output_file_name = self.metadata["output_file_format"].format(case_id + 1)
+
+        input_file_path = os.path.join(self.dirpath, input_file_name)
+        output_file_path = os.path.join(self.dirpath, output_file_name)
+
+        input_text = read_text(input_file_path)
+        output_text = read_text(output_file_path)
 
         exec_cmd = ["python", script_file_path]
         returncode, stdout = self._run_command(exec_cmd, input_file_path)
-        print(returncode)
-        print(stdout)
+
+        is_correct, result_message = ExecuteResult().output_result(
+            input_file_name, input_text, output_text, returncode, stdout
+        )
+        return is_correct, result_message
 
     def execute_all_cases(self) -> None:
-        for case_id in range(1, self.metadata["n_test_cases"] + 1):
-            self._execute_one_case(case_id)
+        script_file_name = self.metadata["script_file"]
+        print(f"exec script: {script_file_name}")
+
+        n_test_cases = self.metadata["n_test_cases"]
+        n_corrects = 0
+        for case_id in range(n_test_cases):
+            is_correct, result_message = self._run_one_case(case_id)
+            if is_correct:
+                n_corrects += 1
+            print(result_message)
+
+        if n_corrects >= n_test_cases:
+            result_message = "All test cases PASSED!"
+            print(ColorCode.GREEN.format(result_message))
+        else:
+            result_message = (
+                f"Some test cases FAILED (pass case {n_corrects} / {n_test_cases})"
+            )
+            print(ColorCode.RED.format(result_message))
