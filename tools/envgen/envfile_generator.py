@@ -1,7 +1,6 @@
-import json
 import os
 
-from tools.common.file_exist_checker import check_dir_not_exist
+from tools.common.file_function import check_dir_not_exist, write_json, write_text
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
 
@@ -39,16 +38,13 @@ class EnvFileGenerator:
             create_dirpath, metadata["output_file_format"]
         )
 
-        with open(meta_file_path, "w", encoding="utf-8") as f:
-            json.dump(metadata, f, indent=4)
-
-        with open(ques_file_path, "w", encoding="utf-8") as f:
-            f.write(content.html)
+        write_json(meta_file_path, metadata)
+        write_text(ques_file_path, content.html)
 
         for i, (input_text, answer_text) in enumerate(
             zip(content.input_list, content.answer_list)
         ):
-            with open(input_file_format.format(i + 1), "w", encoding="utf-8") as f:
-                f.write(input_text)
-            with open(output_file_format.format(i + 1), "w", encoding="utf-8") as f:
-                f.write(answer_text)
+            input_file_path = input_file_format.format(i + 1)
+            output_file_path = output_file_format.format(i + 1)
+            write_text(input_file_path, input_text)
+            write_text(output_file_path, answer_text)

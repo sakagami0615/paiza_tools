@@ -1,11 +1,15 @@
-import json
 import os
 
-import yaml
 from jinja2 import Environment, FileSystemLoader
 
 from tools.codegen.extract_render_param import ExtractRenderParam
-from tools.common.file_exist_checker import check_file_exist, check_file_not_exist
+from tools.common.file_function import (
+    check_file_exist,
+    check_file_not_exist,
+    read_json,
+    read_yaml,
+    write_text,
+)
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
 
@@ -15,8 +19,7 @@ class CodeGenerator:
         self.root_dir = root_dir
         config_filepath = os.path.join(self.root_dir, "user_config.yaml")
         check_file_exist(config_filepath)
-        with open(config_filepath, encoding="utf-8") as f:
-            self.config = yaml.safe_load(f)
+        self.config = read_yaml(config_filepath)
 
     def _render_template(
         self, template_dir_path: str, template_file_name: str, render_param_dict: dict
@@ -35,9 +38,8 @@ class CodeGenerator:
         check_file_exist(meta_file_path)
 
         # Get script file path. In addition, check for existence only when is_overwrite is True.
-        with open(meta_file_path, "r", encoding="utf-8") as f:
-            metadata = json.load(f)
-            script_file_path = os.path.join(dirpath, metadata["script_file"])
+        metadata = read_json(meta_file_path)
+        script_file_path = os.path.join(dirpath, metadata["script_file"])
         if not is_overwrite:
             check_file_not_exist(script_file_path)
 
@@ -55,5 +57,4 @@ class CodeGenerator:
         render_code = self._render_template(
             template_dir_path, template_file_name, render_param_dict
         )
-        with open(script_file_path, "w", encoding="utf-8") as f:
-            f.write(render_code)
+        write_text(script_file_path, render_code)

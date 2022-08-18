@@ -1,0 +1,48 @@
+import json
+import os
+
+import yaml
+
+
+class FileNotExistsError(Exception):
+    pass
+
+
+def check_file_not_exist(filepath: str) -> None:
+    if os.path.isfile(filepath):
+        raise FileExistsError
+
+
+def check_file_exist(filepath: str) -> None:
+    if not os.path.isfile(filepath):
+        raise FileNotExistsError
+
+
+def check_dir_not_exist(dirpath: str) -> None:
+    if os.path.isdir(dirpath):
+        raise FileExistsError
+
+
+def read_text(text_file_path: str) -> str:
+    with open(text_file_path, "r", encoding="utf-8") as f:
+        return f.read()
+
+
+def write_text(text_file_path: str, text_data: str) -> None:
+    with open(text_file_path, "w", encoding="utf-8") as f:
+        f.write(text_data)
+
+
+def read_json(json_file_path: str) -> dict:
+    with open(json_file_path, "r", encoding="utf-8") as f:
+        return json.load(f)
+
+
+def write_json(json_file_path: str, json_data: dict) -> None:
+    with open(json_file_path, "w", encoding="utf-8") as f:
+        json.dump(json_data, f, indent=4)
+
+
+def read_yaml(yaml_file_path: str) -> dict:
+    with open(yaml_file_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)

@@ -3,7 +3,7 @@ import os
 from typing import List
 
 from tools.codegen.code_generator import CodeGenerator
-from tools.common.file_exist_checker import FileNotExistsError
+from tools.common.file_function import FileNotExistsError
 from tools.envgen.envfile_generator import EnvFileGenerator
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 

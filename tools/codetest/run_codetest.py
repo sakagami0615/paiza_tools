@@ -2,7 +2,7 @@ import argparse
 from typing import List
 
 from tools.codetest.execute_code import ExecuteCode
-from tools.common.file_exist_checker import FileNotExistsError
+from tools.common.file_function import FileNotExistsError
 
 
 class RunCodeTest:
