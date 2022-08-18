@@ -41,12 +41,14 @@ class CreateVariableDict:
                 # 日本語などの説明などは除外する
                 if not var_name.isascii():
                     continue
+                # 初回登場の変数登録
                 if var_name not in table_dict:
                     table_dict[var_name] = {
                         "begin": line_cnt,
                         "end": line_cnt + 1,
                         "var": VariableInfo(var_name, size_1d=size_1d, size_2d=size_2d),
                     }
+                # 初回以降の登場変数の情報更新
                 else:
                     table_dict[var_name]["end"] = line_cnt + 1
                     table_dict[var_name]["var"].size_1d = size_1d
@@ -58,15 +60,15 @@ class CreateVariableDict:
         for value in table_dict.values():
             begin_line = value["begin"]
             end_line = value["end"]
-            var_size_1d = value["var"].size_1d
+            size_1d = value["var"].size_1d
             if begin_line + 1 < end_line:
                 # 開始行の値がすでに辞書に登録されている場合は、更新値に反映させる
                 # ex) 辞書が {6: 2 + N} で、(開始,終了,size_1d)が(6,10,M)の場合、{10: 2 + N + M} とする
                 stack = "" if begin_line not in update_dict else update_dict[begin_line]
                 if stack:
-                    update_dict[end_line] = f"{stack} + {var_size_1d}"
+                    update_dict[end_line] = f"{stack} + {size_1d}"
                 else:
-                    update_dict[end_line] = f"{begin_line} + {var_size_1d}"
+                    update_dict[end_line] = f"{begin_line} + {size_1d}"
 
         for key in table_dict:
             if table_dict[key]["begin"] in update_dict:

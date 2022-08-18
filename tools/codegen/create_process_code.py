@@ -12,7 +12,7 @@ class CreateProcessCode:
         return solve_arg_code
 
     def create_input_process_code(self, var_dict: dict) -> str:
-        stdin_proc_code = (self.config["Template"]["StdinProcCode"],)
+        stdin_proc_code = self.config["Template"]["StdinProcCode"]
         tab_str = self.config["TabString"]
 
         input_proc_str = ""

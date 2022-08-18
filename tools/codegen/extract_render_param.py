@@ -42,6 +42,30 @@ class ExtractRenderParam:
         return False, ""
 
     def _extract_variable_dict(self) -> dict:
+        """問題文の入力フォーマットから変数情報を抽出し、辞書を作成する
+
+        Example:
+            この関数で作成する variable_dict は以下のようなデータ型となっている
+            ================================================================
+            var_dict = OrderedDict([
+                ((0, 1),                 [<tools.codegen.variable_info.VariableInfo object at 0x10b4ca700>,
+                                          <tools.codegen.variable_info.VariableInfo object at 0x10b4ca6d0>]),
+                ((1, 2),                 [<tools.codegen.variable_info.VariableInfo object at 0x10b4ca910>,
+                                          <tools.codegen.variable_info.VariableInfo object at 0x10b4ca8e0>]),
+                ((2, '2 + M'),           [<tools.codegen.variable_info.VariableInfo object at 0x10b4ca820>]),
+                (('2 + M', '2 + M + N'), [<tools.codegen.variable_info.VariableInfo object at 0x10b4ca8b0>,
+                                          <tools.codegen.variable_info.VariableInfo object at 0x10b4caa30>])
+            ])
+            ================================================================
+            key情報: (変数が登場する行, 変数が登場しなくなる行)
+            value情報: [登場する変数の情報, ...]
+
+        Raises:
+            ExtractRenderParamError: _description_
+
+        Returns:
+            dict: _description_
+        """
         # 変数抽出用の入力を用意
         var_format = self._remove_blank_in_curly_brackets(self.content.var_format)
         var_format_list = var_format.split("\n")
