@@ -1,6 +1,12 @@
 ignore-paths:
-  - tests
+  - .git
+  - .env
+  - .venv
+  - env
+  - venv
+  - requirements
   - templates
+  - tests
 
 pylint:
   disable:

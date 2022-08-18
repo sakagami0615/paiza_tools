@@ -1,9 +1,9 @@
 import os
 import sys
-from tools.envgen.run_envgen import RunEnvGen
+
 from tools.codegen.run_codegen import RunCodeGen
 from tools.codetest.run_codetest import RunCodeTest
-
+from tools.envgen.run_envgen import RunEnvGen
 
 MODE_ENV_GEN = "gen"
 MODE_CODE_GEN = "codegen"

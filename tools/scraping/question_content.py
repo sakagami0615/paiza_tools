@@ -1,6 +1,5 @@
-from typing import List, Optional
-
 from itertools import zip_longest
+from typing import List, Optional
 
 
 class QuestionContent:

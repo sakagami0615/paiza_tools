@@ -1,8 +1,9 @@
-import os
 import json
+import os
+
+from tools.common.file_exist_checker import check_dir_not_exist
 from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
-from tools.common.file_exist_checker import check_dir_not_exist
 
 
 class EnvFileGenerator:

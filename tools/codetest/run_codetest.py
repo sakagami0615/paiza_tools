@@ -1,6 +1,6 @@
+import argparse
 from typing import List
 
-import argparse
 from tools.codetest.execute_code import ExecuteCode
 from tools.common.file_exist_checker import FileNotExistsError
 

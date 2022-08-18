@@ -1,12 +1,9 @@
+import argparse
 from typing import List
 
-import argparse
-
 from tools.codegen.code_generator import CodeGenerator
-from tools.scraping.skillcheck_content import SkillcheckContent
-
-from tools.scraping.skillcheck_content import PageNotFoundError
 from tools.common.file_exist_checker import FileNotExistsError
+from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
 
 class RunCodeGen:

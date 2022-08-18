@@ -1,13 +1,14 @@
-from typing import Tuple
-
 import re
 from collections import defaultdict
-from tools.codegen.create_variable_dict import CreateVariableDict
-from tools.codegen.variable_checker import VariableChecker
-from tools.codegen.create_process_code import CreateProcessCode
-from tools.scraping.question_content import QuestionContent
+from typing import Tuple
 
-from tools.codegen.create_variable_dict import ExtractRenderParamError
+from tools.codegen.create_process_code import CreateProcessCode
+from tools.codegen.create_variable_dict import (
+    CreateVariableDict,
+    ExtractRenderParamError,
+)
+from tools.codegen.variable_checker import VariableChecker
+from tools.scraping.question_content import QuestionContent
 
 
 class ExtractRenderParam:

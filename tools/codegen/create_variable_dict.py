@@ -1,7 +1,7 @@
-from typing import List, Tuple
-
 import re
 from collections import OrderedDict
+from typing import List, Tuple
+
 from tools.codegen.variable_info import VariableInfo
 
 

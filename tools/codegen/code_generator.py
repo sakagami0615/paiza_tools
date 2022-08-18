@@ -1,13 +1,13 @@
-import os
 import json
+import os
+
 import yaml
 from jinja2 import Environment, FileSystemLoader
 
-from tools.config.file_config import FileConfig
 from tools.codegen.extract_render_param import ExtractRenderParam
+from tools.common.file_exist_checker import check_file_exist, check_file_not_exist
+from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
-from tools.common.file_exist_checker import check_file_not_exist
-from tools.common.file_exist_checker import check_file_exist
 
 
 class CodeGenerator:

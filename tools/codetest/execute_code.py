@@ -1,10 +1,10 @@
+import json
+import os
+import subprocess
 from typing import List, Tuple
 
-import os
-import json
-import subprocess
-from tools.config.file_config import FileConfig
 from tools.common.file_exist_checker import check_file_exist
+from tools.config.file_config import FileConfig
 
 
 class ExecuteCode:

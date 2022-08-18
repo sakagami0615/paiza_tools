@@ -1,14 +1,11 @@
+import argparse
+import os
 from typing import List
 
-import os
-import argparse
-
-from tools.envgen.envfile_generator import EnvFileGenerator
 from tools.codegen.code_generator import CodeGenerator
-from tools.scraping.skillcheck_content import SkillcheckContent
-
-from tools.scraping.skillcheck_content import PageNotFoundError
 from tools.common.file_exist_checker import FileNotExistsError
+from tools.envgen.envfile_generator import EnvFileGenerator
+from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
 
 class RunEnvGen:
