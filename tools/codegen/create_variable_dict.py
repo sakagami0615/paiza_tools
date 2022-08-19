@@ -6,7 +6,9 @@ from tools.codegen.variable_info import VariableInfo
 
 
 class ExtractRenderParamError(Exception):
-    pass
+    def __init__(self):
+        message = "Failed to extract data required for code generation."
+        super().__init__(message)
 
 
 class CreateVariableDict:
@@ -44,47 +46,97 @@ class CreateVariableDict:
                 # 初回登場の変数登録
                 if var_name not in table_dict:
                     table_dict[var_name] = {
-                        "begin": line_cnt,
-                        "end": line_cnt + 1,
+                        "appear_cnt": 1,
+                        "format_line_begin": line_cnt,
+                        "format_line_end": line_cnt + 1,
                         "var": VariableInfo(var_name, size_1d=size_1d, size_2d=size_2d),
                     }
                 # 初回以降の登場変数の情報更新
                 else:
-                    table_dict[var_name]["end"] = line_cnt + 1
+                    table_dict[var_name]["appear_cnt"] += 1
+                    table_dict[var_name]["format_line_end"] = line_cnt + 1
                     table_dict[var_name]["var"].size_1d = size_1d
                     table_dict[var_name]["var"].size_2d = size_2d
             line_cnt += 1
 
-        # Update appear line
-        update_dict = {}
-        for value in table_dict.values():
-            begin_line = value["begin"]
-            end_line = value["end"]
-            size_1d = value["var"].size_1d
-            if begin_line + 1 < end_line:
-                # 開始行の値がすでに辞書に登録されている場合は、更新値に反映させる
-                # ex) 辞書が {6: 2 + N} で、(開始,終了,size_1d) が (6,10,M) の場合、{10: 2 + N + M} とする
-                stack = "" if begin_line not in update_dict else update_dict[begin_line]
-                if stack:
-                    update_dict[end_line] = f"{stack} + {size_1d}"
-                else:
-                    update_dict[end_line] = f"{begin_line} + {size_1d}"
-
-        for key in table_dict:
-            if table_dict[key]["begin"] in update_dict:
-                table_dict[key]["begin"] = update_dict[table_dict[key]["begin"]]
-            if table_dict[key]["end"] in update_dict:
-                table_dict[key]["end"] = update_dict[table_dict[key]["end"]]
-
         return table_dict
 
     def _create_variable_appear_dict(self, table_dict: dict) -> dict:
+        var_size_info_dict = OrderedDict()
+        update_key_dict = OrderedDict()
+        for value in table_dict.values():
+            key = (value["format_line_begin"], value["format_line_end"])
+            if key not in var_size_info_dict:
+                var_size_info_dict[key] = []
+
+            var_size_info_dict[key].append(
+                {
+                    "var_name": value["var"].name,
+                    "var_size_1d": value["var"].size_1d,
+                    "var_size_2d": value["var"].size_2d,
+                }
+            )
+            update_key_dict[key] = {
+                "update_begin": value["format_line_begin"],
+                "update_end": value["format_line_end"],
+                "n_lines": value["format_line_end"] - value["format_line_begin"],
+            }
+
+        # 配列の要素数(定数)の情報をキーに反映
+        # ex) {(0, 1), [a[3], b[3]} の時に {(0, 3), [a[3], b[3]} のように更新する
+        stack_line_cnt = 0
+        for key, var_list in var_size_info_dict.items():
+            # begin の更新
+            update_key_dict[key]["update_begin"] += stack_line_cnt
+
+            # 変数が一つの場合は、行を跨いで入力を取得しない配列のため対象外となる
+            # ex) {(0, 1), [a[3]} の時は "1 2 3" のように1行からデータを取得するため
+            curr_n_lines = var_list[0]["var_size_1d"]
+            prev_n_lines = update_key_dict[key]["n_lines"]
+            if (
+                isinstance(curr_n_lines, int)
+                and len(var_list) > 1
+                and curr_n_lines != prev_n_lines
+            ):
+                # stack値と n_lines の更新
+                stack_line_cnt += curr_n_lines - prev_n_lines
+                update_key_dict[key]["n_lines"] = curr_n_lines
+
+            # end の更新
+            update_key_dict[key]["update_end"] += stack_line_cnt
+
+        # 配列の要素数(変数)の情報をキーに反映
+        # ex) {(0, 1), [a[M], b[M]} の時に {(0, M), [a[M], b[M]} のように更新する
+        stack_elem = ""
+        for key, var_list in var_size_info_dict.items():
+            # begin の更新
+            if stack_elem:
+                update_key_dict[key]["update_begin"] = stack_elem
+
+            # stack_elem がなく、現在見ている変数(配列)の要素数が定数の場合は、対象外となる
+            # stack_elem がない場合は、最初に登場する変数要素を探している状態。
+            # stack_elem に変数を候補した要素が格納されたら、以降に登場する配列の要素数を更新していく。
+            size_1d = var_list[0]["var_size_1d"]
+            if stack_elem or isinstance(size_1d, str):
+                curr_begin = update_key_dict[key]["update_begin"]
+                stack_elem = f"{curr_begin} + {size_1d}"
+                # end と n_lines の更新
+                update_key_dict[key]["update_end"] = stack_elem
+                update_key_dict[key]["n_lines"] = size_1d
+
         appear_dict = OrderedDict()
         for value in table_dict.values():
-            key = (value["begin"], value["end"])
-            if key not in appear_dict:
-                appear_dict[key] = []
-            appear_dict[key].append(value["var"])
+            prev_key = (value["format_line_begin"], value["format_line_end"])
+            update_key = (
+                update_key_dict[prev_key]["update_begin"],
+                update_key_dict[prev_key]["update_end"],
+                update_key_dict[prev_key]["n_lines"],
+            )
+
+            if update_key not in appear_dict:
+                appear_dict[update_key] = []
+            appear_dict[update_key].append(value["var"])
+
         return appear_dict
 
     def _get_datatype(self, element: str) -> str:
@@ -114,7 +166,7 @@ class CreateVariableDict:
 
         # 辞書にデータ型を格納
         def update_var_dict(
-            token_idx: int, var_name: str, var_size: Union[int, str]
+            input_tokens: List[str], token_idx: int, var_name: str
         ) -> int:
             # データ型格納
             if token_idx < len(input_tokens):
@@ -122,38 +174,43 @@ class CreateVariableDict:
                 var_datatype_dict[var_name] = self._get_datatype(
                     input_tokens[token_idx]
                 )
-            # 次の探索データまでインデックスを進める
-            if isinstance(var_size, int):
-                token_idx += var_size
-            else:
-                token_idx += int(var_num_dict[var_size])
-            return token_idx
+
+        # 変数データをint型数値として返却
+        def get_var_integer(var_data: Union[int, str]) -> int:
+            if isinstance(var_data, int):
+                return var_data
+            return int(var_num_dict[var_data])
 
         try:
             input_line = 0
             for key, var_list in appear_dict.items():
-                begin_line, end_line = key
-                input_tokens = onecase_input_list[input_line].split()
+                begin_line, end_line, n_lines = key
+                token_idx = 0
 
                 # 複数行にまたがる変数がない場合
-                if isinstance(begin_line, int) and isinstance(end_line, int):
-                    input_tokens = onecase_input_list[input_line].split()
-                    input_line += 1
-                    token_idx = 0
+                if n_lines == 1:
                     for var in var_list:
-                        token_idx = update_var_dict(token_idx, var.name, var.size_1d)
+                        # 該当の入力データを取得
+                        input_tokens = onecase_input_list[input_line].split()
+                        # 更新
+                        update_var_dict(input_tokens, token_idx, var.name)
+                        token_idx += get_var_integer(var.size_1d)
+                        if token_idx >= len(input_tokens):
+                            input_line += token_idx - len(input_tokens) + 1
+
                 # 複数行にまたがる変数がある場合
                 else:
+                    # 該当の入力データを取得
                     begin_line = self._replace_var_str2int(
                         str(begin_line), var_num_dict
                     )
                     end_line = self._replace_var_str2int(str(end_line), var_num_dict)
-
                     input_tokens = onecase_input_list[input_line].split()
                     input_line += end_line - begin_line
-                    token_idx = 0
+                    # 更新
                     for var in var_list:
-                        token_idx = update_var_dict(token_idx, var.name, var.size_2d)
+                        update_var_dict(input_tokens, token_idx, var.name)
+                        token_idx += get_var_integer(var.size_2d)
 
         except KeyError as exc:
             raise ExtractRenderParamError from exc

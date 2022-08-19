@@ -13,38 +13,19 @@ class VariableChecker:
         return True
 
     def _check_element_size_enable(self, var_dict: dict):
-
         for key, var_list in var_dict.items():
-            begin_line, end_line = key
-
-            # 要素数が定数の時のチェック
-            if isinstance(begin_line, int) and isinstance(end_line, int):
-                line_size = end_line - begin_line
-
-            # 要素数に変数を使用しているの時のチェック
-            else:
-                end_line = str(end_line)
-                pattern = re.sub("([+-])", r"[\1]", str(begin_line))
-                match = re.search(f"^{pattern}", end_line)
-                if match:
-                    # <pattern> + [""|"+"|"-"] の文字を削除する
-                    line_size = re.sub(pattern, "", end_line, 1).strip()
-                    line_size = re.sub("([+-])", "", line_size, 1).strip()
-                    line_size = line_size if not line_size.isdigit() else int(line_size)
-                else:
-                    line_size = end_line
-
+            n_lines = key[-1]
             for var in var_list:
-                if isinstance(line_size, int):
+                if isinstance(n_lines, int):
                     enable_flg = (
-                        (var.size_2d == line_size)
-                        if line_size == 1
-                        else (var.size_1d == line_size)
+                        (var.size_2d == n_lines)
+                        if n_lines == 1
+                        else (var.size_1d == n_lines)
                     )
                     if not enable_flg:
                         return False
                 else:
-                    if var.size_1d != line_size:
+                    if var.size_1d != n_lines:
                         return False
         return True
 
@@ -56,10 +37,15 @@ class VariableChecker:
         for var_list in var_dict.values():
             if len(var_list) < 2:
                 continue
-            base_size_1d = var_list[0].size_1d
+            size_set = set()
             for var in var_list:
-                if var.size_1d != base_size_1d:
-                    return False
+                # スカラ変数は対象外
+                if var.size_1d == 1:
+                    continue
+                size_set.add(var.size_1d)
+
+            if len(size_set) > 1:
+                return False
         return True
 
     def _check_element_variable_match(self, var_dict: dict):
