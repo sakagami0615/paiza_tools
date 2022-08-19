@@ -50,5 +50,7 @@ class VariableInfo:
 
     def __str__(self):
         datatype = self.datatype if self.datatype != "" else "None"
-        return f"""{self.name}<{datatype}>[{self.size_1d}({self.is_dynamic_size_1d})]
-                                          [{self.size_2d}({self.is_dynamic_size_2d})]"""
+        return (
+            f"{self.name}<{datatype}>[{self.size_1d}({self.is_dynamic_size_1d})]"
+            f"[{self.size_2d}({self.is_dynamic_size_2d})]"
+        )

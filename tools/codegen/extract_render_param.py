@@ -81,7 +81,6 @@ class ExtractRenderParam:
         # 変数情報の不整合確認
         if not VariableChecker().check_variable_dict(var_dict):
             raise ExtractRenderParamError
-
         return var_dict
 
     def extract_param_dict(self) -> dict:

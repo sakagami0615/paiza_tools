@@ -4,16 +4,16 @@ import os
 import yaml
 
 
-def check_file_not_exist(file_path: str) -> None:
-    if os.path.isfile(file_path):
-        message = f"This file('{file_path}') already exists"
-        raise FileExistsError(message)
-
-
 def check_file_exist(file_path: str) -> None:
     if not os.path.isfile(file_path):
         message = f"This file('{file_path}') not found"
         raise FileNotFoundError(message)
+
+
+def check_file_not_exist(file_path: str) -> None:
+    if os.path.isfile(file_path):
+        message = f"This file('{file_path}') already exists"
+        raise FileExistsError(message)
 
 
 def check_dir_not_exist(dir_path: str) -> None:

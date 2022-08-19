@@ -40,7 +40,8 @@ class ExecuteCode:
                 stdout=subprocess.PIPE,
                 stderr=subprocess.STDOUT,
             )
-        return proc.returncode, proc.stdout[:-1]  # 末尾の改行を1文字削除
+            actual = proc.stdout[:-1]  # 末尾の改行を1文字削除
+        return proc.returncode, actual
 
     def _run_one_case(self, case_id: int) -> Tuple[bool, str]:
         script_file_name = self.metadata["script_file"]

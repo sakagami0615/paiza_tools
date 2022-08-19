@@ -10,5 +10,6 @@ ignore-paths:
 
 pylint:
   disable:
-    - too-many-arguments
     - subprocess-run-check
+    - too-many-arguments
+    - too-many-locals
