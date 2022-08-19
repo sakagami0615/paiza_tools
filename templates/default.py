@@ -28,7 +28,7 @@ def main():
         for stdin in sys.stdin:
             for item_str in stdin.split():
                 yield item_str
-    iter = stdin_iter()
+    iter_var = stdin_iter()
     {%- endif %}
     {{ input_process }}
     solve({{ solve_argument }})

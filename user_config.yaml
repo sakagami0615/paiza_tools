@@ -9,4 +9,4 @@ Template:
 
   # main.py内で標準入力を取得する際のコード
   # 本ツールでコード生成をする際には、下記のコードにて表中入力を取得する
-  StdinProcCode: 'next(iter)'
+  StdinProcCode: 'next(iter_var)'
