@@ -4,23 +4,22 @@ import os
 import yaml
 
 
-class FileNotExistsError(Exception):
-    pass
+def check_file_not_exist(file_path: str) -> None:
+    if os.path.isfile(file_path):
+        message = f"This file('{file_path}') already exists"
+        raise FileExistsError(message)
 
 
-def check_file_not_exist(filepath: str) -> None:
-    if os.path.isfile(filepath):
-        raise FileExistsError
+def check_file_exist(file_path: str) -> None:
+    if not os.path.isfile(file_path):
+        message = f"This file('{file_path}') not found"
+        raise FileNotFoundError(message)
 
 
-def check_file_exist(filepath: str) -> None:
-    if not os.path.isfile(filepath):
-        raise FileNotExistsError
-
-
-def check_dir_not_exist(dirpath: str) -> None:
-    if os.path.isdir(dirpath):
-        raise FileExistsError
+def check_dir_not_exist(dir_path: str) -> None:
+    if os.path.isdir(dir_path):
+        message = f"This folder('{dir_path}') already exists"
+        raise FileExistsError(message)
 
 
 def read_text(text_file_path: str) -> str:

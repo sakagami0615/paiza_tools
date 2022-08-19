@@ -2,7 +2,6 @@ import argparse
 from typing import List
 
 from tools.codegen.code_generator import CodeGenerator
-from tools.common.file_function import FileNotExistsError
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
 
@@ -40,5 +39,5 @@ class RunCodeGen:
             print("ERROR1")
         except FileExistsError:
             print("ERROR2")
-        except FileNotExistsError:
+        except FileNotFoundError:
             print("ERROR3")

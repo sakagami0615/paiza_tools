@@ -17,9 +17,9 @@ from tools.scraping.question_content import QuestionContent
 class CodeGenerator:
     def __init__(self, root_dir: str):
         self.root_dir = root_dir
-        config_filepath = os.path.join(self.root_dir, "user_config.yaml")
-        check_file_exist(config_filepath)
-        self.config = read_yaml(config_filepath)
+        config_file_path = os.path.join(self.root_dir, "user_config.yaml")
+        check_file_exist(config_file_path)
+        self.config = read_yaml(config_file_path)
 
     def _render_template(
         self, template_dir_path: str, template_file_name: str, render_param_dict: dict

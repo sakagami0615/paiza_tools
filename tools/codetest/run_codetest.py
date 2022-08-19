@@ -2,7 +2,6 @@ import argparse
 from typing import List
 
 from tools.codetest.execute_code import ExecuteCode
-from tools.common.file_function import FileNotExistsError
 
 
 class RunCodeTest:
@@ -23,5 +22,5 @@ class RunCodeTest:
     def run(self):
         try:
             ExecuteCode(self.args.workspace).execute_all_cases()
-        except FileNotExistsError:
+        except FileNotFoundError:
             print("Error1")

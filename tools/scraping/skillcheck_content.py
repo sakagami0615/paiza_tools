@@ -7,15 +7,23 @@ from tools.scraping.question_content import QuestionContent
 
 
 class PageNotFoundError(Exception):
-    pass
+    def __init__(self):
+        message = "Input html text is not skillcheck page."
+        super().__init__(message)
 
 
 class QuestionNumberError(Exception):
-    pass
+    def __init__(self, title):
+        message = f"Unable to extract number from this title('{title}')."
+        super().__init__(message)
 
 
 class SampleCaseSizeError(Exception):
-    pass
+    def __init__(self, n_inputs, n_outputs):
+        message = (
+            f"n_input_files({n_inputs}) and n_output_files({n_outputs}) do not match."
+        )
+        super().__init__(message)
 
 
 class SkillcheckContent:
@@ -62,7 +70,7 @@ class SkillcheckContent:
         title = title.replace("再チャレンジ", "").strip()
         ques_number = title.split(":")[0].strip()
         if not ques_number:
-            raise QuestionNumberError
+            raise QuestionNumberError(problem_soup.text)
 
         return ques_number
 
@@ -134,7 +142,7 @@ class SkillcheckContent:
         cate_soups = page_soup.find_all("div", class_="sample-content__title")
         data_soups = page_soup.find_all("pre", class_="sample-content__input")
         input_list = []
-        answer_list = []
+        output_list = []
 
         for cate_soup, data_soup in zip(cate_soups, data_soups):
             cate = cate_soup.text.strip()
@@ -142,14 +150,14 @@ class SkillcheckContent:
             if cate.find("入力例") >= 0:
                 input_list.append(data)
             elif cate.find("出力例") >= 0:
-                answer_list.append(data)
+                output_list.append(data)
 
         # 入力と出力のサンプル数のサンプル数の非一致確認
         n_test_cases = len(input_list)
-        if n_test_cases != len(answer_list):
-            raise SampleCaseSizeError
+        if n_test_cases != len(output_list):
+            raise SampleCaseSizeError(len(input_list), len(output_list))
 
-        return (n_test_cases, input_list, answer_list)
+        return (n_test_cases, input_list, output_list)
 
     def create_question_content(self) -> QuestionContent:
         page_html = self._get_html_from_clipboard()
@@ -160,7 +168,7 @@ class SkillcheckContent:
         var_format = self._extract_variable_format(page_soup)
         excepted_output = self._extract_excepted_output(page_soup)
         condition = self._extract_condition(page_soup)
-        n_test_cases, input_list, answer_list = self._extract_testcase_data(page_soup)
+        n_test_cases, input_list, output_list = self._extract_testcase_data(page_soup)
 
         return QuestionContent(
             page_html,
@@ -171,5 +179,5 @@ class SkillcheckContent:
             condition,
             n_test_cases,
             input_list,
-            answer_list,
+            output_list,
         )
