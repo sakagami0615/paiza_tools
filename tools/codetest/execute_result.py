@@ -66,4 +66,4 @@ class ExecuteResult:
             result_message += f"{stdout}\n\n"
             is_correct = False
 
-        return is_correct, result_message
+        return is_correct, result_state, result_message

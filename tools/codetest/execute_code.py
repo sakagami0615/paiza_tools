@@ -2,10 +2,16 @@ import os
 import subprocess
 from typing import List, Tuple
 
-from tools.codetest.execute_result import ExecuteResult
+from tools.codetest.execute_result import ExecuteResult, ResultType
 from tools.common.color_code import ColorCode
 from tools.common.file_function import check_file_exist, read_json, read_text
 from tools.config.file_config import FileConfig
+
+
+class RunTimeError(Exception):
+    def __init__(self):
+        message = "Failed to extract data required for code generation."
+        super().__init__(message)
 
 
 class ExecuteCode:
@@ -59,10 +65,17 @@ class ExecuteCode:
         exec_cmd = ["python", script_file_path]
         returncode, stdout = self._run_command(exec_cmd, input_file_path)
 
-        is_correct, result_message = ExecuteResult().output_result(
+        is_correct, result_state, result_message = ExecuteResult().output_result(
             input_file_name, input_text, output_text, returncode, stdout
         )
-        return is_correct, result_message
+        return is_correct, result_state, result_message
+
+    def check_run_time_error(self) -> None:
+        n_test_cases = self.metadata["n_test_cases"]
+        for case_id in range(n_test_cases):
+            _, result_state, _ = self._run_one_case(case_id)
+            if result_state == ResultType.RE:
+                raise RunTimeError
 
     def execute_all_cases(self) -> None:
         script_file_name = self.metadata["script_file"]
@@ -71,7 +84,7 @@ class ExecuteCode:
         n_test_cases = self.metadata["n_test_cases"]
         n_corrects = 0
         for case_id in range(n_test_cases):
-            is_correct, result_message = self._run_one_case(case_id)
+            is_correct, _, result_message = self._run_one_case(case_id)
             if is_correct:
                 n_corrects += 1
             print(result_message)
