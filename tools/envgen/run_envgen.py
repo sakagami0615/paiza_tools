@@ -2,8 +2,8 @@ import argparse
 import os
 from typing import List
 
-from tools.codegen.code_generator import CodeGenerator
-from tools.codetest.execute_code import ExecuteCode, RunTimeError
+from tools.codegen.code_generator import CodeGenerator, RunTimeError
+from tools.codegen.create_variable_dict import ExtractRenderParamError
 from tools.envgen.envfile_generator import EnvFileGenerator
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
@@ -35,27 +35,28 @@ class RunEnvGen:
         try:
             # Env Gen
             content = SkillcheckContent().create_question_content()
-            EnvFileGenerator().generate_file(
-                content, self.args.workspace, self.args.overwrite
-            )
+            generator = EnvFileGenerator()
+            generator.generate_file(content, self.args.workspace, self.args.overwrite)
 
             # Code Gen
             ques_dirpath = os.path.join(self.args.workspace, content.ques_number)
-            CodeGenerator(self.root_dir).generate_file(
-                content, ques_dirpath, self.args.overwrite
-            )
+            coder = CodeGenerator(self.root_dir)
+            coder.generate_file(content, ques_dirpath, self.args.overwrite)
+
+        # TODO: 成功/失敗のメッセージを作成する
         except PageNotFoundError:
             print("PageNotFoundError")
-            return
+
         except FileExistsError:
             print("FileExistsError")
-            return
+
         except FileNotFoundError:
             print("FileNotFoundError")
-            return
 
-        try:
-            # Check Gen Code RTE
-            ExecuteCode(ques_dirpath).check_run_time_error()
+        except ExtractRenderParamError:
+            coder.generate_file_empty_param(ques_dirpath)
+            print("RunTimeError")
+
         except RunTimeError:
+            coder.generate_file_empty_param(ques_dirpath)
             print("RunTimeError")

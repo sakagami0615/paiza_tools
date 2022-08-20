@@ -2,6 +2,7 @@ import re
 from collections import OrderedDict
 from typing import List, Tuple, Union
 
+from tools.codegen.variable_checker import VariableChecker
 from tools.codegen.variable_info import VariableInfo
 
 
@@ -214,8 +215,10 @@ class CreateVariableDict:
 
         except KeyError as exc:
             raise ExtractRenderParamError from exc
+
         except IndexError as exc:
             raise ExtractRenderParamError from exc
+
         return var_datatype_dict
 
     def _update_datatype_in_variable_appear_dict(
@@ -236,4 +239,9 @@ class CreateVariableDict:
             appear_dict, onecase_input_list
         )
         self._update_datatype_in_variable_appear_dict(appear_dict, datatype_dict)
+
+        # 変数情報の不整合確認
+        if not VariableChecker().check_variable_dict(appear_dict):
+            raise ExtractRenderParamError
+
         return appear_dict

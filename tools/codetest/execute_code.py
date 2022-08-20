@@ -1,17 +1,11 @@
 import os
-import subprocess
-from typing import List, Tuple
+from typing import Tuple
 
-from tools.codetest.execute_result import ExecuteResult, ResultType
+from tools.codetest.execute_result import ExecuteResult
 from tools.common.color_code import ColorCode
 from tools.common.file_function import check_file_exist, read_json, read_text
+from tools.common.run_command import run_command
 from tools.config.file_config import FileConfig
-
-
-class RunTimeError(Exception):
-    def __init__(self):
-        message = "Failed to extract data required for code generation."
-        super().__init__(message)
 
 
 class ExecuteCode:
@@ -35,20 +29,6 @@ class ExecuteCode:
             check_file_exist(input_file_path)
             check_file_exist(output_file_path)
 
-    def _run_command(
-        self, exec_cmd: List[str], input_file_path: Tuple[int, str]
-    ) -> Tuple[int, str]:
-        with open(input_file_path, "r", encoding="utf-8") as f:
-            proc = subprocess.run(
-                exec_cmd,
-                stdin=f,
-                universal_newlines=True,
-                stdout=subprocess.PIPE,
-                stderr=subprocess.STDOUT,
-            )
-            actual = proc.stdout[:-1]  # 末尾の改行を1文字削除
-        return proc.returncode, actual
-
     def _run_one_case(self, case_id: int) -> Tuple[bool, str]:
         script_file_name = self.metadata["script_file"]
         script_file_path = os.path.join(self.dirpath, script_file_name)
@@ -63,19 +43,12 @@ class ExecuteCode:
         output_text = read_text(output_file_path)
 
         exec_cmd = ["python", script_file_path]
-        returncode, stdout = self._run_command(exec_cmd, input_file_path)
+        returncode, stdout = run_command(exec_cmd, input_file_path)
 
         is_correct, result_state, result_message = ExecuteResult().output_result(
             input_file_name, input_text, output_text, returncode, stdout
         )
         return is_correct, result_state, result_message
-
-    def check_run_time_error(self) -> None:
-        n_test_cases = self.metadata["n_test_cases"]
-        for case_id in range(n_test_cases):
-            _, result_state, _ = self._run_one_case(case_id)
-            if result_state == ResultType.RE:
-                raise RunTimeError
 
     def execute_all_cases(self) -> None:
         script_file_name = self.metadata["script_file"]

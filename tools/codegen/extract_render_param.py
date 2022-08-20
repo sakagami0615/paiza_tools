@@ -1,13 +1,8 @@
 import re
-from collections import defaultdict
 from typing import Tuple
 
 from tools.codegen.create_process_code import CreateProcessCode
-from tools.codegen.create_variable_dict import (
-    CreateVariableDict,
-    ExtractRenderParamError,
-)
-from tools.codegen.variable_checker import VariableChecker
+from tools.codegen.create_variable_dict import CreateVariableDict
 from tools.scraping.question_content import QuestionContent
 
 
@@ -77,30 +72,22 @@ class ExtractRenderParam:
             else self.content.input_list[0].split("\n")
         )
         var_dict = CreateVariableDict().create_dict(var_format_list, onecase_input_list)
-
-        # 変数情報の不整合確認
-        if not VariableChecker().check_variable_dict(var_dict):
-            raise ExtractRenderParamError
         return var_dict
 
     def extract_param_dict(self) -> dict:
-        try:
-            is_yes_str, yes_str = self._extract_const_yes()
-            is_no_str, no_str = self._extract_const_no()
-            var_dict = self._extract_variable_dict()
-            solve_args = self.coder.create_solve_argument_code(var_dict)
-            input_process = self.coder.create_input_process_code(var_dict)
+        is_yes_str, yes_str = self._extract_const_yes()
+        is_no_str, no_str = self._extract_const_no()
+        var_dict = self._extract_variable_dict()
+        solve_args = self.coder.create_solve_argument_code(var_dict)
+        input_process = self.coder.create_input_process_code(var_dict)
 
-            render_param_dict = {
-                "extract_success": True,
-                "is_yes_str": is_yes_str,
-                "is_no_str": is_no_str,
-                "yes_str": yes_str,
-                "no_str": no_str,
-                "input_process": input_process,
-                "solve_argument": solve_args,
-            }
-            return render_param_dict
-
-        except ExtractRenderParamError:
-            return defaultdict(str)
+        render_param_dict = {
+            "extract_success": True,
+            "is_yes_str": is_yes_str,
+            "is_no_str": is_no_str,
+            "yes_str": yes_str,
+            "no_str": no_str,
+            "input_process": input_process,
+            "solve_argument": solve_args,
+        }
+        return render_param_dict
