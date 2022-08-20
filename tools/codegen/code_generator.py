@@ -19,7 +19,7 @@ from tools.scraping.question_content import QuestionContent
 
 class RunTimeError(Exception):
     def __init__(self):
-        message = "Failed to extract data required for code generation."
+        message = "There was a problem with the generated code."
         super().__init__(message)
 
 

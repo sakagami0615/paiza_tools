@@ -3,6 +3,7 @@ from typing import List
 
 from tools.codegen.code_generator import CodeGenerator, RunTimeError
 from tools.codegen.create_variable_dict import ExtractRenderParamError
+from tools.common.color_code import ColorCode
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
 
@@ -31,25 +32,46 @@ class RunCodeGen:
 
     def run(self):
         try:
-            # Code Gen
+            print("[Info] Extract information from the skill check question text.")
             content = SkillcheckContent().create_question_content()
+
+            # Code Gen
+            print(f"[Info] Generate skillcheck python script in {self.args.workspace}.")
             coder = CodeGenerator(self.root_dir)
             coder.generate_file(content, self.args.workspace, self.args.overwrite)
+            print(
+                ColorCode.GREEN.format(
+                    "[Info] Environment folder generation is successful."
+                )
+            )
 
-        # TODO: 成功/失敗のメッセージを作成する
-        except PageNotFoundError:
-            print("PageNotFoundError")
+        except PageNotFoundError as e:
+            print(
+                ColorCode.RED.format(
+                    f"[ERROR] {e} Please copy the HTML text of the skillcheck website to the clipboard."
+                )
+            )
 
-        except FileExistsError:
-            print("FileExistsError")
+        except FileExistsError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
 
-        except FileNotFoundError:
-            print("FileNotFoundError")
+        except FileNotFoundError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
 
-        except ExtractRenderParamError:
+        except ExtractRenderParamError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
+            print(
+                ColorCode.YELLOW.format(
+                    "[WARNING] Generate skillcheck python script without extract data."
+                )
+            )
             coder.generate_file_empty_param(self.args.workspace)
-            print("ExtractRenderParamError")
 
-        except RunTimeError:
+        except RunTimeError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
+            print(
+                ColorCode.YELLOW.format(
+                    "[WARNING] Generate skillcheck python script without extract data."
+                )
+            )
             coder.generate_file_empty_param(self.args.workspace)
-            print("RunTimeError")

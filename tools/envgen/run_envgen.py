@@ -4,6 +4,7 @@ from typing import List
 
 from tools.codegen.code_generator import CodeGenerator, RunTimeError
 from tools.codegen.create_variable_dict import ExtractRenderParamError
+from tools.common.color_code import ColorCode
 from tools.envgen.envfile_generator import EnvFileGenerator
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
 
@@ -33,30 +34,56 @@ class RunEnvGen:
 
     def run(self):
         try:
-            # Env Gen
+            print("[Info] Extract information from the skill check question text.")
             content = SkillcheckContent().create_question_content()
+
+            # Env Gen
+            print(
+                f"[Info] Generate skillcheck environment folder '{self.args.workspace}'"
+            )
             generator = EnvFileGenerator()
             generator.generate_file(content, self.args.workspace, self.args.overwrite)
 
             # Code Gen
+            print(
+                f"[Info] Generate skillcheck python script for No-{content.ques_number}."
+            )
             ques_dirpath = os.path.join(self.args.workspace, content.ques_number)
             coder = CodeGenerator(self.root_dir)
             coder.generate_file(content, ques_dirpath, self.args.overwrite)
+            print(
+                ColorCode.GREEN.format(
+                    "[Info] Environment folder generation is successful."
+                )
+            )
 
-        # TODO: 成功/失敗のメッセージを作成する
-        except PageNotFoundError:
-            print("PageNotFoundError")
+        except PageNotFoundError as e:
+            print(
+                ColorCode.RED.format(
+                    f"[ERROR] {e} Please copy the HTML text of the skillcheck website to the clipboard."
+                )
+            )
 
-        except FileExistsError:
-            print("FileExistsError")
+        except FileExistsError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
 
-        except FileNotFoundError:
-            print("FileNotFoundError")
+        except FileNotFoundError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
 
-        except ExtractRenderParamError:
+        except ExtractRenderParamError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
+            print(
+                ColorCode.YELLOW.format(
+                    "[WARNING] Generate skillcheck python script without extract data."
+                )
+            )
             coder.generate_file_empty_param(ques_dirpath)
-            print("RunTimeError")
 
-        except RunTimeError:
+        except RunTimeError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
+            print(
+                ColorCode.YELLOW.format(
+                    "[WARNING] Generate skillcheck python script without extract data."
+                )
+            )
             coder.generate_file_empty_param(ques_dirpath)
-            print("RunTimeError")
