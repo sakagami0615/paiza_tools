@@ -3,8 +3,6 @@ import sys
 
 sys.path.append(os.path.join(os.path.dirname(__file__), '..'))
 
-from collections import defaultdict
-
 import pytest
 
 from tools.codegen.code_generator import CodeGenerator
@@ -222,7 +220,7 @@ class TestCodeGen:
 
         assert is_file_exist == False
         config_file_path = os.path.join(tmpdir, "user_config.yaml")
-        assert str(e.value) == f"This file('{config_file_path}') not found"
+        assert str(e.value) == f"File '{config_file_path}' not found."
 
 
     def test_not_find_metadata_file(self, tmpdir, monkeypatch: pytest.MonkeyPatch):
@@ -236,12 +234,15 @@ class TestCodeGen:
 
         assert is_file_exist == False
         metadata_file_path = os.path.join(tmpdir, "_metadata.json")
-        assert str(e.value) == f"This file('{metadata_file_path}') not found"
+        assert str(e.value) == f"File '{metadata_file_path}' not found."
 
 
     def test_not_find_template_script_file(self, tmpdir, monkeypatch: pytest.MonkeyPatch):
         monkeypatch.setattr(CodeGenerator, '__init__', lambda arg, root_dir: None)
-        dummy_metadata = {"script_file": "main.py"}
+        dummy_metadata = {
+            "script_file": "main.py",
+            "n_test_cases": 0,
+            "input_file_format": "dymmy_{}.txt"}
         metadata_file_path = os.path.join(tmpdir, "_metadata.json")
         write_json(metadata_file_path, dummy_metadata)
 
@@ -255,4 +256,4 @@ class TestCodeGen:
 
         assert is_file_exist == False
         template_file_path = os.path.join(tmpdir, generator.config['Template']['FilePath'])
-        assert str(e.value) == f"This file('{template_file_path}') not found"
+        assert str(e.value) == f"File '{template_file_path}' not found."

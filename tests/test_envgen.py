@@ -47,4 +47,4 @@ class TestEnvGen:
 
         assert is_success == False
         env_dir_path = os.path.join(tmpdir, 'dummy_number')
-        assert str(e.value) == f"This folder('{env_dir_path}') already exists"
+        assert str(e.value) == f"Folder '{env_dir_path}' already exists."
