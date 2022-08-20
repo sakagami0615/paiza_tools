@@ -1,5 +1,6 @@
 import os
 import sys
+from pathlib import Path
 
 from tools.codegen.run_codegen import RunCodeGen
 from tools.codetest.run_codetest import RunCodeTest
@@ -18,6 +19,18 @@ def usage(args):
     print(f"{args[0]} usage : show this tool's usage")
 
 
+def get_root_path():
+    exe_file = os.path.basename(sys.executable)
+    # pyスクリプト実行時
+    if exe_file.find("python") != -1:
+        print(sys.argv[0])
+        return os.path.dirname(sys.argv[0])
+
+    # exeファイル実行時
+    # (3つ上のフォルダが paiza_toolsのrootフォルダになる)
+    return Path(Path(Path(sys.executable).parent).parent).parent
+
+
 if __name__ == "__main__":
 
     cmdline_args = sys.argv
@@ -26,7 +39,7 @@ if __name__ == "__main__":
         usage(cmdline_args)
         sys.exit()
 
-    root_dir = os.path.dirname(os.path.abspath(__file__))
+    root_dir = get_root_path()
 
     tool_prog = " ".join(cmdline_args[:2])
     tool_mode = cmdline_args[1]
