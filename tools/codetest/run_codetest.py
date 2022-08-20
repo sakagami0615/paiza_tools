@@ -1,7 +1,9 @@
 import argparse
+import os
 from typing import List
 
 from tools.codetest.execute_code import ExecuteCode
+from tools.common.color_code import ColorCode
 
 
 class RunCodeTest:
@@ -21,6 +23,14 @@ class RunCodeTest:
 
     def run(self):
         try:
-            ExecuteCode(self.args.workspace).execute_all_cases()
-        except FileNotFoundError:
-            print("Error1")
+            tester = ExecuteCode(self.args.workspace)
+
+            script_file_path = os.path.join(
+                tester.dirpath, tester.metadata["script_file"]
+            )
+            print(f"[INFO] Python exec file: {script_file_path}")
+
+            tester.execute_all_cases()
+
+        except FileNotFoundError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))

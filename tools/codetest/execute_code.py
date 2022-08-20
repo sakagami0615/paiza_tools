@@ -8,6 +8,16 @@ from tools.common.run_command import run_command
 from tools.config.file_config import FileConfig
 
 
+def display_splitter(func):
+    def wrapper(*args, **kwargs):
+        print("=================================================")
+        res = func(*args, **kwargs)
+        print("=================================================")
+        return res
+
+    return wrapper
+
+
 class ExecuteCode:
     def __init__(self, dirpath: str):
         self.dirpath = dirpath
@@ -50,10 +60,8 @@ class ExecuteCode:
         )
         return is_correct, result_state, result_message
 
+    @display_splitter
     def execute_all_cases(self) -> None:
-        script_file_name = self.metadata["script_file"]
-        print(f"exec script: {script_file_name}")
-
         n_test_cases = self.metadata["n_test_cases"]
         n_corrects = 0
         for case_id in range(n_test_cases):
