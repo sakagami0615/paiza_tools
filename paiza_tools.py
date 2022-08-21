@@ -23,7 +23,6 @@ def get_root_path():
     exe_file = os.path.basename(sys.executable)
     # pyスクリプト実行時
     if exe_file.find("python") != -1:
-        print(sys.argv[0])
         return os.path.dirname(sys.argv[0])
 
     # exeファイル実行時
