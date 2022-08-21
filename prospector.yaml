@@ -1,0 +1,15 @@
+ignore-paths:
+  - .git
+  - .env
+  - .venv
+  - env
+  - venv
+  - requirements
+  - templates
+  - tests
+
+pylint:
+  disable:
+    - subprocess-run-check
+    - too-many-arguments
+    - too-many-locals

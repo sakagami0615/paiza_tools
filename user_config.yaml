@@ -1,0 +1,12 @@
+# main.py内で使用するタブ文字
+# ex) '    ' or '\t' ect.
+TabString: '    '
+
+Template:
+  # main.pyのテンプレートとなるファイル名
+  # paiza_tools.pyフォルダ階層からの相対パスで指定する
+  FilePath: 'templates/default.py'
+
+  # main.py内で標準入力を取得する際のコード
+  # 本ツールでコード生成をする際には、下記のコードにて表中入力を取得する
+  StdinProcCode: 'next(iter_var)'
