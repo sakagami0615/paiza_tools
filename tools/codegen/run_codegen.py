@@ -1,7 +1,11 @@
 import argparse
 from typing import List
 
-from tools.codegen.code_generator import CodeGenerator, RunTimeError
+from tools.codegen.code_generator import (
+    CodeGenerator,
+    InputProcessingError,
+    RunTimeError,
+)
 from tools.codegen.create_variable_dict import ExtractRenderParamError
 from tools.common.color_code import ColorCode
 from tools.scraping.skillcheck_content import PageNotFoundError, SkillcheckContent
@@ -68,6 +72,15 @@ class RunCodeGen:
             coder.generate_file_empty_param(self.args.workspace)
 
         except RunTimeError as e:
+            print(ColorCode.RED.format(f"[ERROR] {e}"))
+            print(
+                ColorCode.YELLOW.format(
+                    "[WARNING] Generate skillcheck python script without extract data."
+                )
+            )
+            coder.generate_file_empty_param(self.args.workspace)
+
+        except InputProcessingError as e:
             print(ColorCode.RED.format(f"[ERROR] {e}"))
             print(
                 ColorCode.YELLOW.format(

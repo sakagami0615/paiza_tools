@@ -27,6 +27,11 @@ skip = [
     "templates",
 ]
 
+[tool.pytest.ini_options]
+testpaths = [
+    "tests",
+]
+
 #[tool.pylint."MASTER"]
 #ignore = [
 #    ".git",

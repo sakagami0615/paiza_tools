@@ -17,7 +17,7 @@ def create_dummy_config() -> dict:
     return {
         'TabString': '    ',
         'Template': {
-            'FilePath': 'tests/template_default.py',
+            'FilePath': 'DummyPath',
             'StdinProcCode': 'next(iter_var)'
         }
     }
@@ -42,7 +42,7 @@ class TestCodeGen:
         assert result['input_process'] == expected_code
 
 
-    def test_enable_const_yesy_no(self):
+    def test_enable_const_yes_no(self):
         config = create_dummy_config()
         content_1 = QuestionContent('', '', '',
                                     '', '"yes" or "no"', '',
@@ -66,7 +66,7 @@ class TestCodeGen:
         assert (result_3['is_no_str'], result_3['no_str']) == (True, 'NO')
 
 
-    def test_disable_const_yesy_no(self):
+    def test_disable_const_yes_no(self):
         config = create_dummy_config()
         content = QuestionContent('', '', '',
                                   '', '"y e s" or "n o"', '',

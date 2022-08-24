@@ -36,6 +36,7 @@ class CreateVariableDict:
         # Extract variable info and appear line
         table_dict = OrderedDict()
         line_cnt = 0
+
         for line in var_format_list:
             for item in line.split():
                 if "..." in item:
@@ -86,6 +87,7 @@ class CreateVariableDict:
         # 配列の要素数(定数)の情報をキーに反映
         # ex) {(0, 1), [a[3], b[3]} の時に {(0, 3), [a[3], b[3]} のように更新する
         stack_line_cnt = 0
+
         for key, var_list in var_size_info_dict.items():
             # begin の更新
             update_key_dict[key]["update_begin"] += stack_line_cnt
@@ -121,9 +123,11 @@ class CreateVariableDict:
             if stack_elem or isinstance(size_1d, str):
                 curr_begin = update_key_dict[key]["update_begin"]
                 stack_elem = f"{curr_begin} + {size_1d}"
-                # end と n_lines の更新
+                # end の更新
                 update_key_dict[key]["update_end"] = stack_elem
-                update_key_dict[key]["n_lines"] = size_1d
+                # [1行にList変数が2つ以上ある] もしくは [行を跨る変数] の場合、 n_lines を更新
+                if len(var_list) >= 2 or update_key_dict[key]["n_lines"] != 1:
+                    update_key_dict[key]["n_lines"] = size_1d
 
         appear_dict = OrderedDict()
         for value in table_dict.values():
