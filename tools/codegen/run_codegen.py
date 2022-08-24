@@ -37,7 +37,7 @@ class RunCodeGen:
     def run(self):
         try:
             print("[Info] Extract information from the skill check question text.")
-            content = SkillcheckContent().create_question_content()
+            content = SkillcheckContent(self.args.workspace).create_question_content()
 
             # Code Gen
             print(f"[Info] Generate skillcheck python script in {self.args.workspace}.")

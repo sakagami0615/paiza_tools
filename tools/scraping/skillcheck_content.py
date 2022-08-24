@@ -1,8 +1,11 @@
+import os
 from typing import List, Optional, Tuple
 
 import pyperclip
 from bs4 import BeautifulSoup
 
+from tools.common.file_function import check_file_exist, read_json, read_text
+from tools.config.file_config import FileConfig
 from tools.scraping.question_content import QuestionContent
 
 
@@ -33,8 +36,14 @@ class SkillcheckContent:
     CONDITION_CLASS_TEXT = "条件"
     BOX_CLASS_NAMES = ["box1", "box2", "box3"]
 
-    def __init__(self):
-        pass
+    def __init__(self, dirpath: str = ""):
+        meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
+        try:
+            check_file_exist(meta_file_path)
+            metadata = read_json(meta_file_path)
+            self.ques_html_path = os.path.join(dirpath, metadata["question_file"])
+        except FileNotFoundError:
+            self.ques_html_path = None
 
     def _strip_all_lines(self, text: str) -> str:
         return "\n".join([x.strip() for x in text.split("\n")]).strip()
@@ -45,8 +54,39 @@ class SkillcheckContent:
             remove_head_list = [x.strip() for x in remove_head_list]
         return "\n".join(remove_head_list)
 
+    def _judge_html_format(self, html_text: str) -> bool:
+        page_soup = BeautifulSoup(html_text, "html.parser")
+
+        if page_soup.find("h1", class_="d-problem__page-title") is None:
+            return False
+        if page_soup.find("div", class_="inr1") is None:
+            return False
+        if page_soup.find("div", class_="inr2") is None:
+            return False
+
+        return True
+
+    def _get_html_from_localfile(self) -> str:
+        if self.ques_html_path is None:
+            return ""
+        return read_text(self.ques_html_path)
+
     def _get_html_from_clipboard(self) -> str:
         return pyperclip.paste()
+
+    def _get_ques_html(self) -> str:
+        local_html_text = self._get_html_from_localfile()
+        clip_html_text = self._get_html_from_clipboard()
+
+        local_html_result = self._judge_html_format(local_html_text)
+        clip_html_result = self._judge_html_format(clip_html_text)
+
+        if not local_html_result and not clip_html_result:
+            raise PageNotFoundError
+
+        if local_html_result:
+            return local_html_text
+        return clip_html_text
 
     def _find_text_in_box_class(
         self, src_soup: BeautifulSoup, class_text: str
@@ -63,9 +103,6 @@ class SkillcheckContent:
 
     def _extract_question_number(self, page_soup: BeautifulSoup) -> str:
         problem_soup = page_soup.find("h1", class_="d-problem__page-title")
-        if problem_soup is None:
-            raise PageNotFoundError
-
         title = problem_soup.text
         title = title.replace("再チャレンジ", "").strip()
         ques_number = title.split(":")[0].strip()
@@ -76,17 +113,11 @@ class SkillcheckContent:
 
     def _extract_question_sentence(self, page_soup: BeautifulSoup) -> str:
         inr1_soup = page_soup.find("div", class_="inr1")
-        if inr1_soup is None:
-            raise PageNotFoundError
-
         sentence = inr1_soup.text.strip()
         return sentence
 
     def _extract_variable_format(self, page_soup: BeautifulSoup) -> Optional[str]:
         inr2_soup = page_soup.find("div", class_="inr2")
-        if inr2_soup is None:
-            raise PageNotFoundError
-
         format_soup = self._find_text_in_box_class(inr2_soup, self.VARIABLE_CLASS_TEXT)
         if format_soup is None:
             return None
@@ -102,9 +133,6 @@ class SkillcheckContent:
 
     def _extract_excepted_output(self, page_soup: BeautifulSoup) -> Optional[str]:
         inr2_soup = page_soup.find("div", class_="inr2")
-        if inr2_soup is None:
-            raise PageNotFoundError
-
         excepted_soup = self._find_text_in_box_class(
             inr2_soup, self.EXPECTED_OUTPUT_CLASS_TEXT
         )
@@ -118,9 +146,6 @@ class SkillcheckContent:
 
     def _extract_condition(self, page_soup: BeautifulSoup) -> Optional[str]:
         inr2_soup = page_soup.find("div", class_="inr2")
-        if inr2_soup is None:
-            raise PageNotFoundError
-
         condition_soup = self._find_text_in_box_class(
             inr2_soup, self.CONDITION_CLASS_TEXT
         )
@@ -160,7 +185,7 @@ class SkillcheckContent:
         return (n_test_cases, input_list, output_list)
 
     def create_question_content(self) -> QuestionContent:
-        page_html = self._get_html_from_clipboard()
+        page_html = self._get_ques_html()
         page_soup = BeautifulSoup(page_html, "html.parser")
 
         ques_number = self._extract_question_number(page_soup)
