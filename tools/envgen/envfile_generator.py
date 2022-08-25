@@ -21,21 +21,21 @@ class EnvFileGenerator:
         return metadata_dict
 
     def generate_file(
-        self, content: QuestionContent, dirpath: str, is_overwrite: bool
+        self, content: QuestionContent, dir_path: str, is_overwrite: bool
     ) -> None:
-        create_dirpath = os.path.join(dirpath, content.ques_number)
+        create_dir_path = os.path.join(dir_path, content.ques_number)
         if not is_overwrite:
-            check_dir_not_exist(create_dirpath)
+            check_dir_not_exist(create_dir_path)
 
-        os.makedirs(create_dirpath, exist_ok=True)
+        os.makedirs(create_dir_path, exist_ok=True)
 
         metadata = self._create_metadata(content)
 
-        meta_file_path = os.path.join(create_dirpath, metadata["metadata_file"])
-        ques_file_path = os.path.join(create_dirpath, metadata["question_file"])
-        input_file_format = os.path.join(create_dirpath, metadata["input_file_format"])
+        meta_file_path = os.path.join(create_dir_path, metadata["metadata_file"])
+        ques_file_path = os.path.join(create_dir_path, metadata["question_file"])
+        input_file_format = os.path.join(create_dir_path, metadata["input_file_format"])
         output_file_format = os.path.join(
-            create_dirpath, metadata["output_file_format"]
+            create_dir_path, metadata["output_file_format"]
         )
 
         write_json(meta_file_path, metadata)

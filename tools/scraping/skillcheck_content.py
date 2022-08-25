@@ -36,12 +36,12 @@ class SkillcheckContent:
     CONDITION_CLASS_TEXT = "条件"
     BOX_CLASS_NAMES = ["box1", "box2", "box3"]
 
-    def __init__(self, dirpath: str = ""):
-        meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
+    def __init__(self, dir_path: str = ""):
+        meta_file_path = os.path.join(dir_path, FileConfig.METADATA_FILE)
         try:
             check_file_exist(meta_file_path)
             metadata = read_json(meta_file_path)
-            self.ques_html_path = os.path.join(dirpath, metadata["question_file"])
+            self.ques_html_path = os.path.join(dir_path, metadata["question_file"])
         except FileNotFoundError:
             self.ques_html_path = None
 

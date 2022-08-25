@@ -87,23 +87,25 @@ class CodeGenerator:
                 raise InputProcessingError
 
     def _confirm_env_dir(
-        self, dirpath: str, is_overwrite: bool
+        self, dir_path: str, is_overwrite: bool
     ) -> Optional[Tuple[int, str, str, str]]:
         # Load metadata
-        meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
+        meta_file_path = os.path.join(dir_path, FileConfig.METADATA_FILE)
         check_file_exist(meta_file_path)
 
         # Get script file path. In addition, check for existence only when is_overwrite is True.
         metadata = read_json(meta_file_path)
-        code_script_file_path = os.path.join(dirpath, metadata["script_file"])
+        code_script_file_path = os.path.join(dir_path, metadata["script_file"])
         if not is_overwrite:
             check_file_not_exist(code_script_file_path)
 
-        test_script_file_path = os.path.join(dirpath, "test_" + metadata["script_file"])
+        test_script_file_path = os.path.join(
+            dir_path, "test_" + metadata["script_file"]
+        )
 
         # Check testcase file exists
-        input_file_format = os.path.join(dirpath, metadata["input_file_format"])
-        output_file_format = os.path.join(dirpath, metadata["input_file_format"])
+        input_file_format = os.path.join(dir_path, metadata["input_file_format"])
+        output_file_format = os.path.join(dir_path, metadata["input_file_format"])
         n_test_cases = metadata["n_test_cases"]
         for case_id in range(n_test_cases):
             check_file_exist(input_file_format.format(case_id + 1))
@@ -129,7 +131,7 @@ class CodeGenerator:
         )
 
     def generate_file(
-        self, content: QuestionContent, dirpath: str, is_overwrite: bool
+        self, content: QuestionContent, dir_path: str, is_overwrite: bool
     ) -> None:
         (
             code_script_file_path,
@@ -139,7 +141,7 @@ class CodeGenerator:
             output_file_format,
             code_template_file_path,
             test_template_file_path,
-        ) = self._confirm_env_dir(dirpath, is_overwrite)
+        ) = self._confirm_env_dir(dir_path, is_overwrite)
 
         # Get the necessary parameters for render from content and create a script
         render_param_dict = ExtractRenderParam(
@@ -171,7 +173,7 @@ class CodeGenerator:
             output_file_format,
         )
 
-    def generate_file_empty_param(self, dirpath: str) -> None:
+    def generate_file_empty_param(self, dir_path: str) -> None:
         (
             code_script_file_path,
             _,
@@ -180,7 +182,7 @@ class CodeGenerator:
             _,
             code_template_file_path,
             _,
-        ) = self._confirm_env_dir(dirpath, True)
+        ) = self._confirm_env_dir(dir_path, True)
 
         (code_template_dir_path, code_template_file_name) = os.path.split(
             code_template_file_path
