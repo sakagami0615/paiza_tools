@@ -31,8 +31,16 @@ class InputProcessingError(Exception):
 
 
 class CodeGenerator:
-    def __init__(self, root_dir: str):
+
+    INPUT_TEST_TEMPLATE_PATH = "tools/codegen/input_test_template.txt"
+
+    def __init__(
+        self,
+        root_dir: str,
+        dir_path: str,
+    ):
         self.root_dir = root_dir
+        self.dir_path = dir_path
         config_file_path = os.path.join(self.root_dir, "user_config.yaml")
         check_file_exist(config_file_path)
         self.config = read_yaml(config_file_path)
@@ -86,26 +94,20 @@ class CodeGenerator:
             if actual_text != except_text:
                 raise InputProcessingError
 
-    def _confirm_env_dir(
-        self, dir_path: str, is_overwrite: bool
-    ) -> Optional[Tuple[int, str, str, str]]:
+    def _confirm_env_dir(self, is_overwrite: bool) -> dict:
         # Load metadata
-        meta_file_path = os.path.join(dir_path, FileConfig.METADATA_FILE)
+        meta_file_path = os.path.join(self.dir_path, FileConfig.METADATA_FILE)
         check_file_exist(meta_file_path)
 
         # Get script file path. In addition, check for existence only when is_overwrite is True.
         metadata = read_json(meta_file_path)
-        code_script_file_path = os.path.join(dir_path, metadata["script_file"])
+        code_script_file_path = os.path.join(self.dir_path, metadata["script_file"])
         if not is_overwrite:
             check_file_not_exist(code_script_file_path)
 
-        test_script_file_path = os.path.join(
-            dir_path, "test_" + metadata["script_file"]
-        )
-
         # Check testcase file exists
-        input_file_format = os.path.join(dir_path, metadata["input_file_format"])
-        output_file_format = os.path.join(dir_path, metadata["input_file_format"])
+        input_file_format = os.path.join(self.dir_path, metadata["input_file_format"])
+        output_file_format = os.path.join(self.dir_path, metadata["input_file_format"])
         n_test_cases = metadata["n_test_cases"]
         for case_id in range(n_test_cases):
             check_file_exist(input_file_format.format(case_id + 1))
@@ -117,31 +119,29 @@ class CodeGenerator:
         )
         check_file_exist(code_template_file_path)
         test_template_file_path = os.path.join(
-            self.root_dir, "tools/codegen/input_test_template.txt"
+            self.root_dir, self.INPUT_TEST_TEMPLATE_PATH
         )
         check_file_exist(test_template_file_path)
-        return (
-            code_script_file_path,
-            test_script_file_path,
-            n_test_cases,
-            input_file_format,
-            output_file_format,
-            code_template_file_path,
-            test_template_file_path,
+        return metadata
+
+    def generate_file(self, content: QuestionContent, is_overwrite: bool) -> None:
+        metadata = self._confirm_env_dir(is_overwrite)
+
+        code_script_file_path = os.path.join(self.dir_path, metadata["script_file"])
+        test_script_file_path = os.path.join(
+            self.dir_path, "test_" + metadata["script_file"]
         )
 
-    def generate_file(
-        self, content: QuestionContent, dir_path: str, is_overwrite: bool
-    ) -> None:
-        (
-            code_script_file_path,
-            test_script_file_path,
-            n_test_cases,
-            input_file_format,
-            output_file_format,
-            code_template_file_path,
-            test_template_file_path,
-        ) = self._confirm_env_dir(dir_path, is_overwrite)
+        input_file_format = os.path.join(self.dir_path, metadata["input_file_format"])
+        output_file_format = os.path.join(self.dir_path, metadata["input_file_format"])
+        n_test_cases = metadata["n_test_cases"]
+
+        code_template_file_path = os.path.join(
+            self.root_dir, self.config["Template"]["FilePath"]
+        )
+        test_template_file_path = os.path.join(
+            self.root_dir, self.INPUT_TEST_TEMPLATE_PATH
+        )
 
         # Get the necessary parameters for render from content and create a script
         render_param_dict = ExtractRenderParam(
@@ -173,16 +173,13 @@ class CodeGenerator:
             output_file_format,
         )
 
-    def generate_file_empty_param(self, dir_path: str) -> None:
-        (
-            code_script_file_path,
-            _,
-            _,
-            _,
-            _,
-            code_template_file_path,
-            _,
-        ) = self._confirm_env_dir(dir_path, True)
+    def generate_file_empty_param(self) -> None:
+        metadata = self._confirm_env_dir(True)
+
+        code_script_file_path = os.path.join(self.dir_path, metadata["script_file"])
+        code_template_file_path = os.path.join(
+            self.root_dir, self.config["Template"]["FilePath"]
+        )
 
         (code_template_dir_path, code_template_file_name) = os.path.split(
             code_template_file_path

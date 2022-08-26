@@ -53,8 +53,8 @@ class RunEnvGen:
                 f"[Info] Generate skillcheck python script for No-{content.ques_number}."
             )
             ques_dir_path = os.path.join(self.args.workspace, content.ques_number)
-            coder = CodeGenerator(self.root_dir)
-            coder.generate_file(content, ques_dir_path, self.args.overwrite)
+            coder = CodeGenerator(self.root_dir, ques_dir_path)
+            coder.generate_file(content, self.args.overwrite)
             print(
                 ColorCode.GREEN.format(
                     "[Info] Environment folder generation is successful."
@@ -81,7 +81,7 @@ class RunEnvGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(ques_dir_path)
+            coder.generate_file_empty_param()
 
         except RunTimeError as e:
             print(ColorCode.RED.format(f"[ERROR] {e}"))
@@ -90,7 +90,7 @@ class RunEnvGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(ques_dir_path)
+            coder.generate_file_empty_param()
 
         except InputProcessingError as e:
             print(ColorCode.RED.format(f"[ERROR] {e}"))
@@ -99,4 +99,4 @@ class RunEnvGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(ques_dir_path)
+            coder.generate_file_empty_param()

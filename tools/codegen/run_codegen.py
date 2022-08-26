@@ -41,8 +41,8 @@ class RunCodeGen:
 
             # Code Gen
             print(f"[Info] Generate skillcheck python script in {self.args.workspace}.")
-            coder = CodeGenerator(self.root_dir)
-            coder.generate_file(content, self.args.workspace, self.args.overwrite)
+            coder = CodeGenerator(self.root_dir, self.args.workspace)
+            coder.generate_file(content, self.args.overwrite)
             print(
                 ColorCode.GREEN.format(
                     "[Info] Environment folder generation is successful."
@@ -69,7 +69,7 @@ class RunCodeGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(self.args.workspace)
+            coder.generate_file_empty_param()
 
         except RunTimeError as e:
             print(ColorCode.RED.format(f"[ERROR] {e}"))
@@ -78,7 +78,7 @@ class RunCodeGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(self.args.workspace)
+            coder.generate_file_empty_param()
 
         except InputProcessingError as e:
             print(ColorCode.RED.format(f"[ERROR] {e}"))
@@ -87,4 +87,4 @@ class RunCodeGen:
                     "[WARNING] Generate skillcheck python script without extract data."
                 )
             )
-            coder.generate_file_empty_param(self.args.workspace)
+            coder.generate_file_empty_param()
