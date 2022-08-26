@@ -28,7 +28,7 @@ def read_text(text_file_path: str) -> str:
 
 
 def write_text(text_file_path: str, text_data: str) -> None:
-    with open(text_file_path, "w", encoding="utf-8") as f:
+    with open(text_file_path, "w", encoding="utf-8", newline="") as f:
         f.write(text_data)
 
 

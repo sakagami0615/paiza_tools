@@ -17,8 +17,8 @@ class TestEnvGen:
                                   2, ['dummy_input_1', 'dummy_input_2'], ['dummy_answer_1, dummy_answer_2'])
         EnvFileGenerator().generate_file(content, tmpdir, True)
 
-        dirpath = os.path.join(tmpdir, 'dummy_number')
-        is_dir = True if os.path.isdir(dirpath) else False
+        dir_path = os.path.join(tmpdir, 'dummy_number')
+        is_dir = True if os.path.isdir(dir_path) else False
         assert is_dir == True
 
 
@@ -29,8 +29,8 @@ class TestEnvGen:
         EnvFileGenerator().generate_file(content, tmpdir, True)
         EnvFileGenerator().generate_file(content, tmpdir, True)
 
-        dirpath = os.path.join(tmpdir, 'dummy_number')
-        is_dir = True if os.path.isdir(dirpath) else False
+        dir_path = os.path.join(tmpdir, 'dummy_number')
+        is_dir = True if os.path.isdir(dir_path) else False
         assert is_dir == True
 
 

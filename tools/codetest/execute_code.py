@@ -19,35 +19,35 @@ def display_splitter(func):
 
 
 class ExecuteCode:
-    def __init__(self, dirpath: str):
-        self.dirpath = dirpath
-        meta_file_path = os.path.join(dirpath, FileConfig.METADATA_FILE)
+    def __init__(self, dir_path: str):
+        self.dir_path = dir_path
+        meta_file_path = os.path.join(dir_path, FileConfig.METADATA_FILE)
         check_file_exist(meta_file_path)
         self.metadata = read_json(meta_file_path)
         self._check_env_data()
 
     def _check_env_data(self) -> None:
-        script_file_path = os.path.join(self.dirpath, self.metadata["script_file"])
+        script_file_path = os.path.join(self.dir_path, self.metadata["script_file"])
         check_file_exist(script_file_path)
         for case_id in range(self.metadata["n_test_cases"]):
             input_file_path = os.path.join(
-                self.dirpath, self.metadata["input_file_format"].format(case_id + 1)
+                self.dir_path, self.metadata["input_file_format"].format(case_id + 1)
             )
             output_file_path = os.path.join(
-                self.dirpath, self.metadata["output_file_format"].format(case_id + 1)
+                self.dir_path, self.metadata["output_file_format"].format(case_id + 1)
             )
             check_file_exist(input_file_path)
             check_file_exist(output_file_path)
 
     def _run_one_case(self, case_id: int) -> Tuple[bool, str]:
         script_file_name = self.metadata["script_file"]
-        script_file_path = os.path.join(self.dirpath, script_file_name)
+        script_file_path = os.path.join(self.dir_path, script_file_name)
 
         input_file_name = self.metadata["input_file_format"].format(case_id + 1)
         output_file_name = self.metadata["output_file_format"].format(case_id + 1)
 
-        input_file_path = os.path.join(self.dirpath, input_file_name)
-        output_file_path = os.path.join(self.dirpath, output_file_name)
+        input_file_path = os.path.join(self.dir_path, input_file_name)
+        output_file_path = os.path.join(self.dir_path, output_file_name)
 
         input_text = read_text(input_file_path)
         output_text = read_text(output_file_path)

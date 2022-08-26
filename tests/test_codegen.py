@@ -17,7 +17,7 @@ def create_dummy_config() -> dict:
     return {
         'TabString': '    ',
         'Template': {
-            'FilePath': 'tests/template_default.py',
+            'FilePath': 'DummyPath',
             'StdinProcCode': 'next(iter_var)'
         }
     }
@@ -42,7 +42,7 @@ class TestCodeGen:
         assert result['input_process'] == expected_code
 
 
-    def test_enable_const_yesy_no(self):
+    def test_enable_const_yes_no(self):
         config = create_dummy_config()
         content_1 = QuestionContent('', '', '',
                                     '', '"yes" or "no"', '',
@@ -66,7 +66,7 @@ class TestCodeGen:
         assert (result_3['is_no_str'], result_3['no_str']) == (True, 'NO')
 
 
-    def test_disable_const_yesy_no(self):
+    def test_disable_const_yes_no(self):
         config = create_dummy_config()
         content = QuestionContent('', '', '',
                                   '', '"y e s" or "n o"', '',
@@ -215,7 +215,7 @@ class TestCodeGen:
     def test_not_find_config_file(self, tmpdir):
         is_file_exist = False
         with pytest.raises(FileNotFoundError) as e:
-            CodeGenerator(tmpdir)
+            CodeGenerator(tmpdir, None)
             is_file_exist = True
 
         assert is_file_exist == False
@@ -224,12 +224,13 @@ class TestCodeGen:
 
 
     def test_not_find_metadata_file(self, tmpdir, monkeypatch: pytest.MonkeyPatch):
-        monkeypatch.setattr(CodeGenerator, '__init__', lambda arg, root_dir: None)
+        monkeypatch.setattr(CodeGenerator, '__init__', lambda arg, root_dir, dir_path: None)
 
         is_file_exist = False
         with pytest.raises(FileNotFoundError) as e:
-            generator = CodeGenerator(None)
-            generator.generate_file(None, tmpdir, False)
+            generator = CodeGenerator(None, None)
+            generator.dir_path = tmpdir
+            generator.generate_file(None, False)
             is_file_exist = True
 
         assert is_file_exist == False
@@ -238,20 +239,21 @@ class TestCodeGen:
 
 
     def test_not_find_template_script_file(self, tmpdir, monkeypatch: pytest.MonkeyPatch):
-        monkeypatch.setattr(CodeGenerator, '__init__', lambda arg, root_dir: None)
+        monkeypatch.setattr(CodeGenerator, '__init__', lambda arg, root_dir, dir_path: None)
         dummy_metadata = {
             "script_file": "main.py",
             "n_test_cases": 0,
-            "input_file_format": "dymmy_{}.txt"}
+            "input_file_format": "dummy_{}.txt"}
         metadata_file_path = os.path.join(tmpdir, "_metadata.json")
         write_json(metadata_file_path, dummy_metadata)
 
         is_file_exist = False
         with pytest.raises(FileNotFoundError) as e:
-            generator = CodeGenerator(None)
+            generator = CodeGenerator(None, None)
             generator.root_dir = tmpdir
+            generator.dir_path = tmpdir
             generator.config = create_dummy_config()
-            generator.generate_file(None, tmpdir, False)
+            generator.generate_file(None, False)
             is_file_exist = True
 
         assert is_file_exist == False

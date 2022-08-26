@@ -26,7 +26,7 @@ class RunCodeTest:
             tester = ExecuteCode(self.args.workspace)
 
             script_file_path = os.path.join(
-                tester.dirpath, tester.metadata["script_file"]
+                tester.dir_path, tester.metadata["script_file"]
             )
             print(f"[INFO] Python exec file: {script_file_path}")
 

@@ -17,13 +17,14 @@ import sys
 
 
 def solve({}):
-    print("hello world")
+    pass
 
 
 def main():
     def stdin_iter():
         for stdin in sys.stdin:
             for item_str in stdin.split():
+                print(item_str)
                 yield item_str
     iter_var = stdin_iter()
     {}
@@ -62,7 +63,7 @@ class TestCodeTest:
         input_process +=  "a_list[i] = a"
 
         input_text = "1 2 3"
-        output_text = "hello world"
+        output_text = "\n".join(input_text.split())
 
         create_codetest_env(tmpdir, solve_args, input_process, input_text, output_text)
 
@@ -79,7 +80,7 @@ class TestCodeTest:
         input_process +=  "a_list[i] = a"
 
         input_text = "1 2 3"
-        output_text = "see you world"
+        output_text = "dummy_output"
 
         create_codetest_env(tmpdir, solve_args, input_process, input_text, output_text)
 
@@ -96,7 +97,7 @@ class TestCodeTest:
         input_process +=  "a_list[i] = a"
 
         input_text = "1 2 3"
-        output_text = "hello world"
+        output_text = "\n".join(input_text.split())
 
         create_codetest_env(tmpdir, solve_args, input_process, input_text, output_text)
 
